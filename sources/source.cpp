@@ -3,6 +3,8 @@
 #include <header.hpp>
 #include <ctpl.h>
 #include <queue>
+#include <mutex>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <boost/program_options.hpp>
@@ -54,7 +56,7 @@ public:
     }
 
 private:
-    void downloading_pages(){
+    void downloading_pages(int id){
         /*Псевдокод
          * if (!download_queue->empty()){
          *      download_this work_in_process = download_queue.pop();
@@ -69,11 +71,16 @@ private:
     void parsing_pages(){
         // см downloading чтоб понять осн суть работы с пулом потоков
     }
-    void writing_output(){}
+    void writing_output(){
+        while (!safe_output.try_lock())
+            std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
+        std::string shit_to_write  = output_queue.pop();
+        safe_output.unlock();
+    }
 
 public:
     void crawl_to_live(){
-        download_queue->push(download_this(url, 0));
+        download_queue->push(download_this(url, (depth - 1)));
         network_threads->push(downloading_pages);
 
         parsing_threads->push(parsing_pages);
@@ -89,8 +96,13 @@ private:
     std::string out;
 
     std::queue <download_this> * download_queue;
+    std::mutex safe_downloads;
+
     std::queue <parse_this> * processing_queue;
+    std::mutex safe_processing;
+
     std::queue <std::string> * output_queue;
+    std::mutex safe_output;
 
     ctpl::thread_pool * network_threads;
     ctpl::thread_pool * parsing_threads;

@@ -1,6 +1,7 @@
 // Copyright 2019 dimakirol <your_email>
 
 #include <header.hpp>
+#include <cstdlib>
 #include <ctpl.h>
 #include <queue>
 #include <mutex>
@@ -38,10 +39,11 @@ public:
     MyCrawler(Params &parameters){
         url = parameters.url;
         depth = parameters.depth;
+        sites_in_work = 1;
         net_thread = parameters.net_thread;
         pars_thread = parameters.pars_thread;
         out = parameters.out;
-        
+
         finish_him = false;
 
         download_queue = new std::queue <download_this>;
@@ -59,23 +61,26 @@ public:
 
 private:
     void downloading_pages(int id){
-        /*Псевдокод
-         * if (!download_queue->empty()){
-         *      download_this work_in_process = download_queue.pop();
-         *      network_threads->push(downloading_pages);
-         *      downloading...
-         * }
-         * else{
-         *      sleep 1 second;
-         * }
-        */
+        //Псевдокод
+//        while((!finish_him) && (sites_in_work))
+//          while (!safe_downloads.try_lock())
+//            std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
+//          if (!download_queue->empty()){
+//               download_this work_in_process = download_queue.pop();
+//               network_threads->push(downloading_pages);
+//               downloading...
+//          }
+//          else{
+//              std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
+//          }
+
     }
     void parsing_pages(){
         // см downloading чтоб понять осн суть работы с пулом потоков
     }
     void writing_output(){
         while (!safe_output.try_lock())
-            std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
         ofstream ostream;
         ostream.open("output.txt", ios::out);
         if (ostream.is_open()){
@@ -110,6 +115,7 @@ private:
     std::string out;
     
     bool finish_him;
+    uint32_t sites_in_work;
 
     std::queue <download_this> * download_queue;
     std::mutex safe_downloads;

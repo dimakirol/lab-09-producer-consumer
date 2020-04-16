@@ -41,6 +41,8 @@ public:
         net_thread = parameters.net_thread;
         pars_thread = parameters.pars_thread;
         out = parameters.out;
+        
+        finish_him = false;
 
         download_queue = new std::queue <download_this>;
         processing_queue = new std::queue <parse_this>;
@@ -106,6 +108,8 @@ private:
     uint32_t net_thread;
     uint32_t pars_thread;
     std::string out;
+    
+    bool finish_him;
 
     std::queue <download_this> * download_queue;
     std::mutex safe_downloads;

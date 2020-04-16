@@ -74,7 +74,19 @@ private:
     void writing_output(){
         while (!safe_output.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
-        std::string shit_to_write  = output_queue.pop();
+        ofstream ostream;
+        ostream.open("output.txt", ios::out);
+        if (ostream.is_open()){
+            while(!output_queue.empty()){
+                std::string shit_to_write = output_queue.front();
+                ostream << shit_to_write << endl;
+                output_queue.pop();
+            }
+            ostream.close();
+        }
+        else{
+            cout << "The file 'output.txt' is not open" << endl;
+        }
         safe_output.unlock();
     }
 

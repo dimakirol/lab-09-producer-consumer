@@ -88,22 +88,25 @@ private:
         // см downloading чтоб понять осн суть работы с пулом потоков
     }
     void writing_output(){
-        while (!safe_output.try_lock())
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
         std::ofstream ostream;
         ostream.open("output.txt", std::ios::out);
-        if (ostream.is_open()){
-            while(!output_queue->empty()){
-                std::string shit_to_write = output_queue->front();
-                ostream << shit_to_write << std::endl;
-                output_queue->pop();
+        while (!finish_him) {
+            if (ostream.is_open()) {
+                while (!safe_output.try_lock()) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+                    while (!output_queue->empty()) {
+                        std::string shit_to_write = output_queue->front();
+                        ostream << shit_to_write << std::endl;
+                        output_queue->pop();
+                        safe_output.unlock();
+                    }
+                }
+                ostream.close();
+            } else {
+                std::cout << "The file 'output.txt' is not open" << std::endl;
+
             }
-            ostream.close();
         }
-        else{
-            std::cout << "The file 'output.txt' is not open" << std::endl;
-        }
-        safe_output.unlock();
     }
 
 public:

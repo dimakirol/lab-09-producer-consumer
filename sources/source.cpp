@@ -127,7 +127,8 @@ public:
 
             writing_output();
             download_queue->push(download_this(url, (depth - 1)));
-            network_threads.push(std::bind(&MyCrawler::downloading_pages, this));
+            for (int i = 0; i <= net_thread; ++i)
+                network_threads.push(std::bind(&MyCrawler::downloading_pages, this));
             parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this));
         } catch (std::logic_error const& e){
             std::cout << e.what();

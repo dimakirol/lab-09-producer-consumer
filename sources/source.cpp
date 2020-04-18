@@ -31,6 +31,10 @@ struct _Params{
 typedef struct _Params Params;
 
 struct _download_this{
+    _download_this(){
+        url = std::string("");
+        current_depth = 0;
+    }
     _download_this(std::string link, uint32_t _current_depth){
         url = link;
         current_depth = _current_depth;
@@ -41,6 +45,10 @@ struct _download_this{
 typedef struct _download_this download_this;
 
 struct _parse_this{
+    _parse_this(){
+        website = std::string("");
+        current_depth = 0;
+    }
     _parse_this(std::string site, uint32_t _current_depth){
         website = site;
         current_depth = _current_depth;
@@ -76,7 +84,7 @@ public:
     }
 
 private:
-    void downloading_pages(){
+    void downloading_pages(ctpl::thread_pool *network_threads){
         std::cout << "Kukuxa uletela" << std::endl;
         //Псевдокод
 //        while((!finish_him.load()) && (sites_in_work))
@@ -84,7 +92,7 @@ private:
 //            std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
 //          if (!download_queue->empty()){
 //               download_this work_in_process = download_queue.pop();
-//               network_threads->push(downloading_pages);
+//               network_threads->push(std::bind(&MyCrawler::downloading_pages, this, network_threads));
 //               downloading...
 //          }
 //          else{
@@ -147,17 +155,18 @@ private:
         }
     }
  
-    void parsing_pages() {
+    void parsing_pages(ctpl::thread_pool *parsing_threads) {
         //without finish_him
+        //parsing_threads->push(std::bind(&MyCrawler::parsing_pages, this, parsing_threads));
         std::string site_to_parse;
         uint32_t current_depth;
         download_this download_package;
         
         while (!safe_processing.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
-        site_to_parse = download_queue->front().website;
-        current_depth = download_queue->front().depth;
-        download_queue.pop();
+        site_to_parse = processing_queue->front().website;
+        current_depth = processing_queue->front().current_depth;
+        processing_queue->pop();
         safe_processing.unlock();
         
         std::vector<std::string> img_references;
@@ -171,8 +180,8 @@ private:
             while (!safe_downloads.try_lock())
                 std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
             while (!href_references.empty()) {
-                download_package.website = href_references[href_references.size() - 1];
-                download_package.depth = current_depth - 1;
+                download_package.url = href_references[href_references.size() - 1];
+                download_package.current_depth = current_depth - 1;
                 download_queue->push(download_package);
                 href_references.pop_back();
             }
@@ -182,7 +191,7 @@ private:
         while (!safe_output.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
         while (!img_references.empty()) {
-            output_queue->push(img_references[img_references.size() - 1])
+            output_queue->push(img_references[img_references.size() - 1]);
             img_references.pop_back();
         }
         safe_downloads.unlock();
@@ -224,9 +233,9 @@ public:
 
             writing_output();
             download_queue->push(download_this(url, (depth - 1)));
-            for (int i = 0; i <= net_thread; ++i)
-                network_threads.push(std::bind(&MyCrawler::downloading_pages, this));
-            parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this));
+            network_threads.push(std::bind(&MyCrawler::downloading_pages, this, &network_threads));
+
+            parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this, &parsing_threads));
         } catch (std::logic_error const& e){
             std::cout << e.what();
         } catch (...){

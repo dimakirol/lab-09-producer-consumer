@@ -47,6 +47,10 @@ cstdlib
 -
 ctpl.h
 -
+vector
+-
+string
+-
 queue
 -
 mutex
@@ -58,6 +62,8 @@ chrono
 fstream
 -
 iostream
+-
+iterator
 -
 boost/thread/thread.hpp
 -

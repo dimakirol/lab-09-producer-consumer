@@ -89,8 +89,102 @@ private:
 //          }
 
     }
-    void parsing_pages(){
-        // см downloading чтоб понять осн суть работы с пулом потоков
+    static void search_for_links(GumboNode* node, std::vector<std::string>& img_references, std::vector<std::string>& href_references) {
+        if (node->type != GUMBO_NODE_ELEMENT) {
+            return;
+        }
+        GumboAttribute* ref;
+        if (node->v.element.tag == GUMBO_TAG_A &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
+            href_references.push_back(std::string(ref->value));
+        }
+
+        if (node->v.element.tag == GUMBO_TAG_META &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "contents"))) {
+            img_references.push_back(std::string(ref->value));
+        }
+
+        if (node->v.element.tag == GUMBO_TAG_IMG &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "src"))) {
+            img_references.push_back(std::string(ref->value));
+        }
+
+        if (node->v.element.tag == GUMBO_TAG_INPUT &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))) {
+            if (std::string(ref->value) == "image") {
+                ref = gumbo_get_attribute(&node->v.element.attributes, "src");
+                img_references.push_back(std::string(ref->value));
+            }
+        }
+
+        GumboVector* children = &node->v.element.children;
+        for (unsigned int i = 0; i < children->length; ++i) {
+            search_for_links(static_cast<GumboNode*>(children->data[i]), img_references, href_references);
+        }
+    }
+
+    void all_right_img_references(std::vector<std::string>& img_references, std::vector<std::string>& href_references) {
+        /*
+        for (auto& i = img_references.begin(); i != img_references.end();) {
+          if ((i->find(".jpg") == npos) || (i->find(".png") == npos)) {
+              i = img_references.erase(i);
+          } else {
+              ++i;
+          }
+        }
+    */
+
+        for (auto j = href_references.begin(); j != href_references.end();) {
+            if ((j->find(".jpg") != std::string::npos) || (j->find(".png") != std::string::npos)) {
+                img_references.push_back(*j);
+                j = href_references.erase(j);
+            } else {
+                ++j;
+            }
+        }
+    }
+ 
+    void parsing_pages() {
+        //without finish_him
+        std::string site_to_parse;
+        uint32_t current_depth;
+        download_this download_package;
+        
+        while (!safe_processing.try_lock())
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+        site_to_parse = download_queue->front().website;
+        current_depth = download_queue->front().depth;
+        download_queue.pop();
+        safe_processing.unlock();
+        
+        std::vector<std::string> img_references;
+        std::vector<std::string> href_references;
+
+        GumboOutput* output = gumbo_parse(site_to_parse.c_str());
+        search_for_links(output->root, img_references, href_references);
+        all_right_img_references(img_references, href_references);
+        
+        if (current_depth) {
+            while (!safe_downloads.try_lock())
+                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+            while (!href_references.empty()) {
+                download_package.website = href_references[href_references.size() - 1];
+                download_package.depth = current_depth - 1;
+                download_queue->push(download_package);
+                href_references.pop_back();
+            }
+            safe_downloads.unlock();
+        }
+
+        while (!safe_output.try_lock())
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+        while (!img_references.empty()) {
+            output_queue->push(img_references[img_references.size() - 1])
+            img_references.pop_back();
+        }
+        safe_downloads.unlock();
+        
+        gumbo_destroy_output(&kGumboDefaultOptions, output);
     }
     void writing_output(){
         return;

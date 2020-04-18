@@ -10,6 +10,7 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/beast.hpp>
 
 namespace po=boost::program_options;
 

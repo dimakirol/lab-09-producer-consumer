@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6"/>
 	<Project>
-		<Option title="8_lab"/>
+		<Option title="9_lab"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
 		<Option virtualFolders="CMake Files\;"/>
@@ -27,8 +27,8 @@
 					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="8_lab">
-				<Option output="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/8_lab" prefix_auto="0" extension_auto="0"/>
+			<Target title="9_lab">
+				<Option output="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/9_lab" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -47,14 +47,14 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 8_lab"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 9_lab"/>
 					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="8_lab/fast">
-				<Option output="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/8_lab" prefix_auto="0" extension_auto="0"/>
+			<Target title="9_lab/fast">
+				<Option output="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/9_lab" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -73,7 +73,7 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 8_lab/fast"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 9_lab/fast"/>
 					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
@@ -91,7 +91,7 @@
 			</Target>
 		</Build>
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/sources/source.cpp">
-			<Option target="8_lab"/>
+			<Option target="9_lab"/>
 		</Unit>
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>

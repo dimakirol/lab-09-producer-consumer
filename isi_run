@@ -1,0 +1,2 @@
+./9_lab --type=parse --url=https://pornhub.com --depth=2 --network_threads=2 --parser_threads=2 --output=my_mind.txt
+

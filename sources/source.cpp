@@ -5,9 +5,11 @@
 #include <ctpl.h>
 #include <queue>
 #include <mutex>
+#include <atomic>
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/beast.hpp>
@@ -69,9 +71,10 @@ public:
     }
 
 private:
-    void downloading_pages(int id){
+    void downloading_pages(){
+        std::cout << "Kukuxa uletela" << std::endl;
         //Псевдокод
-//        while((!finish_him) && (sites_in_work))
+//        while((!finish_him.load()) && (sites_in_work))
 //          while (!safe_downloads.try_lock())
 //            std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
 //          if (!download_queue->empty()){
@@ -88,39 +91,48 @@ private:
         // см downloading чтоб понять осн суть работы с пулом потоков
     }
     void writing_output(){
+        return;
         std::ofstream ostream;
-        ostream.open("output.txt", std::ios::out);
-        while (!finish_him) {
+        ostream.open(out, std::ios::out);
+        while (!finish_him.load()) {
             if (ostream.is_open()) {
-                while (!safe_output.try_lock()) {
+                while (!safe_output.try_lock())
                     std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
-                    while (!output_queue->empty()) {
-                        std::string shit_to_write = output_queue->front();
-                        ostream << shit_to_write << std::endl;
-                        output_queue->pop();
-                        safe_output.unlock();
-                    }
+                bool empty_queue = output_queue->empty();
+                safe_output.unlock();
+                while (!empty_queue) {
+                    while (!safe_output.try_lock())
+                        std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+                    std::string shit_to_write = output_queue->front();
+                    ostream << shit_to_write << std::endl;
+                    output_queue->pop();
+                    empty_queue = output_queue->empty();
+                    safe_output.unlock();
                 }
                 ostream.close();
             } else {
-                std::cout << "The file 'output.txt' is not open" << std::endl;
-
+                std::cout << "The file " << out << " is not open" << std::endl;
+                throw std::logic_error("Output file is not opened!:(!");
             }
         }
     }
 
 public:
     void crawl_to_live(){
-        ctpl::thread_pool network_threads(net_thread);
-        ctpl::thread_pool parsing_threads(pars_thread);
-        return;
+        try {
+            ctpl::thread_pool network_threads(net_thread);
+            ctpl::thread_pool parsing_threads(pars_thread);
 
-        //download_queue->push(download_this(url, (depth - 1)));
-        //network_threads->push(downloading_pages);
+            writing_output();
+            download_queue->push(download_this(url, (depth - 1)));
+            network_threads.push(std::bind(&MyCrawler::downloading_pages, this));
+            parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this));
+        } catch (std::logic_error const& e){
+            std::cout << e.what();
+        } catch (...){
+            std::cout << "Unknown error! Ask those stupid coders:0";
 
-        //parsing_threads->push(parsing_pages);
-
-        writing_output();
+        }
     }
 
 private:
@@ -130,7 +142,7 @@ private:
     uint32_t pars_thread;
     std::string out;
     
-    bool finish_him;
+    std::atomic_bool finish_him;
     uint32_t sites_in_work;
 
     std::queue <download_this> * download_queue;

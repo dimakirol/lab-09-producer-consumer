@@ -24,35 +24,43 @@ struct _Params{
 typedef struct _Params Params;
 
 struct _download_this{
+    _download_this(std::string link, uint32_t _current_depth){
+        url = link;
+        current_depth = _current_depth;
+    }
     std::string url;
     uint32_t current_depth;
 };
 typedef struct _download_this download_this;
 
 struct _parse_this{
-    ifstream website_file;
+    _parse_this(std::string site, uint32_t _current_depth){
+        website = site;
+        current_depth = _current_depth;
+    }
+    std::string website;
     uint32_t current_depth;
 };
 typedef struct _parse_this parse_this;
 
 class MyCrawler{
 public:
-    MyCrawler(Params &parameters){
+    explicit MyCrawler(Params &parameters){
         url = parameters.url;
         depth = parameters.depth;
         sites_in_work = 1;
         net_thread = parameters.net_thread;
         pars_thread = parameters.pars_thread;
         out = parameters.out;
+        std::cout << url << std::endl << depth << std::endl
+        << sites_in_work << std::endl << net_thread << std::endl
+        << pars_thread << std::endl << out;
 
         finish_him = false;
 
         download_queue = new std::queue <download_this>;
         processing_queue = new std::queue <parse_this>;
         output_queue = new std::queue <std::string>;
-
-        *network_threads = ctpl::thread_pool(net_thread);
-        *parsing_threads = ctpl::thread_pool(pars_thread);
     }
     ~MyCrawler(){
         delete download_queue;
@@ -82,28 +90,32 @@ private:
     void writing_output(){
         while (!safe_output.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
-        ofstream ostream;
-        ostream.open("output.txt", ios::out);
+        std::ofstream ostream;
+        ostream.open("output.txt", std::ios::out);
         if (ostream.is_open()){
-            while(!output_queue.empty()){
-                std::string shit_to_write = output_queue.front();
-                ostream << shit_to_write << endl;
-                output_queue.pop();
+            while(!output_queue->empty()){
+                std::string shit_to_write = output_queue->front();
+                ostream << shit_to_write << std::endl;
+                output_queue->pop();
             }
             ostream.close();
         }
         else{
-            cout << "The file 'output.txt' is not open" << endl;
+            std::cout << "The file 'output.txt' is not open" << std::endl;
         }
         safe_output.unlock();
     }
 
 public:
     void crawl_to_live(){
-        download_queue->push(download_this(url, (depth - 1)));
-        network_threads->push(downloading_pages);
+        ctpl::thread_pool network_threads(net_thread);
+        ctpl::thread_pool parsing_threads(pars_thread);
+        return;
 
-        parsing_threads->push(parsing_pages);
+        //download_queue->push(download_this(url, (depth - 1)));
+        //network_threads->push(downloading_pages);
+
+        //parsing_threads->push(parsing_pages);
 
         writing_output();
     }
@@ -126,9 +138,6 @@ private:
 
     std::queue <std::string> * output_queue;
     std::mutex safe_output;
-
-    ctpl::thread_pool * network_threads;
-    ctpl::thread_pool * parsing_threads;
 };
 
 Params parse_cmd(const po::variables_map& vm){

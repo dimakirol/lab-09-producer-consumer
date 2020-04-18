@@ -14,7 +14,10 @@ string(APPEND CMAKE_CXX_FLAGS " -g -Wall -DBOOST_LOG_DYN_LINK")
 set(D_LIBRARY_PATH="/home/kirill/Documents//boost/installed/lib/")
 include_directories(include)
 
-find_package(Boost 1.72.0 COMPONENTS REQUIRED program_options algorithm beast log log_setup)
+set(BEAST_INCLUDE_DIR ${Boost_INCLUDE_DIR}/beast)
+include_directories(${BEAST_INCLUDE_DIR})
+
+find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options log log_setup)
 
 add_executable(8_lab
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp

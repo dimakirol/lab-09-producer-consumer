@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named 8_lab
+# Target rules for targets named 9_lab
 
 # Build rule for target.
-8_lab: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 8_lab
-.PHONY : 8_lab
+9_lab: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 9_lab
+.PHONY : 9_lab
 
 # fast build rule for target.
-8_lab/fast:
-	$(MAKE) -f CMakeFiles/8_lab.dir/build.make CMakeFiles/8_lab.dir/build
-.PHONY : 8_lab/fast
+9_lab/fast:
+	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/build
+.PHONY : 9_lab/fast
 
 sources/source.o: sources/source.cpp.o
 
@@ -129,7 +129,7 @@ sources/source.o: sources/source.cpp.o
 
 # target to build an object file
 sources/source.cpp.o:
-	$(MAKE) -f CMakeFiles/8_lab.dir/build.make CMakeFiles/8_lab.dir/sources/source.cpp.o
+	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/sources/source.cpp.o
 .PHONY : sources/source.cpp.o
 
 sources/source.i: sources/source.cpp.i
@@ -138,7 +138,7 @@ sources/source.i: sources/source.cpp.i
 
 # target to preprocess a source file
 sources/source.cpp.i:
-	$(MAKE) -f CMakeFiles/8_lab.dir/build.make CMakeFiles/8_lab.dir/sources/source.cpp.i
+	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/sources/source.cpp.i
 .PHONY : sources/source.cpp.i
 
 sources/source.s: sources/source.cpp.s
@@ -147,7 +147,7 @@ sources/source.s: sources/source.cpp.s
 
 # target to generate assembly for a file
 sources/source.cpp.s:
-	$(MAKE) -f CMakeFiles/8_lab.dir/build.make CMakeFiles/8_lab.dir/sources/source.cpp.s
+	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/sources/source.cpp.s
 .PHONY : sources/source.cpp.s
 
 # Help Target
@@ -157,7 +157,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... 8_lab"
+	@echo "... 9_lab"
 	@echo "... edit_cache"
 	@echo "... sources/source.o"
 	@echo "... sources/source.i"

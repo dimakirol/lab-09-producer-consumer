@@ -17,18 +17,18 @@ include_directories(include)
 set(BEAST_INCLUDE_DIR ${Boost_INCLUDE_DIR}/beast)
 include_directories(${BEAST_INCLUDE_DIR})
 
-find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options log log_setup)
+find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options log log_setup thread)
 
 add_executable(9_lab
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
         )
 
-target_include_directories(8_lab
+target_include_directories(9_lab
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-target_link_libraries(8_lab ${Boost_LIBRARIES})
+target_link_libraries(9_lab ${Boost_LIBRARIES})
 
 link_directories("${Boost_Path}/installed/lib")

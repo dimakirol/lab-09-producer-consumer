@@ -1,34 +1,88 @@
 cmake_minimum_required(VERSION 3.4)
+project(source)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-cmake_minimum_required(VERSION 3.15)
-project(9_lab)
-
 option(BUILD_COVERAGE "Build coverage" OFF)
-set(CMAKE_CXX_STANDARD 14)
 
-set(Boost_Path "/home/kirill/Documents/boost")
-set(Boost_INCLUDE_DIR "${Boost_Path}/installed/include")
-string(APPEND CMAKE_CXX_FLAGS " -g -Wall -DBOOST_LOG_DYN_LINK")
-set(D_LIBRARY_PATH="/home/kirill/Documents//boost/installed/lib/")
-include_directories(include)
+set(
+        HUNTER_CACHE_SERVERS
+        "https://github.com/bmstu-iu8-cpp-sem-3/hunter-cache"
+        CACHE STRING "Default cache server"
+)
+include("tools/gate/cmake/HunterGate.cmake")
 
-set(BEAST_INCLUDE_DIR ${Boost_INCLUDE_DIR}/beast)
-include_directories(${BEAST_INCLUDE_DIR})
+HunterGate(
+        URL "https://github.com/cpp-pm/hunter/archive/v0.23.218.tar.gz"
+        SHA1 "9a3594a61227967fb92159339ba326701b287b19"
+)
 
-find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options log log_setup thread)
+string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
+string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
+string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
-add_executable(9_lab
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
-        )
+hunter_add_package(GTest)
+find_package(GTest CONFIG REQUIRED)
 
-target_include_directories(9_lab
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-        )
+hunter_add_package(Boost COMPONENTS thread log system filesystem program_options)
+find_package(Boost CONFIG REQUIRED thread log system filesystem program_options)
 
-include_directories(${Boost_INCLUDE_DIRS})
+hunter_add_package(Beast)
+find_package(Beast CONFIG REQUIRED)
 
-target_link_libraries(9_lab ${Boost_LIBRARIES})
+hunter_add_package(OpenSSL)
+find_package(OpenSSL REQUIRED)
 
-link_directories("${Boost_Path}/installed/lib")
+hunter_add_package(Gumbo)
+find_package(gumbo CONFIG REQUIRED)
+
+add_library(source STATIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/parser.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/attribute.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/char_ref.c 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/error.c 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/string_buffer.c 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/string_piece.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/tag.c 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/tokenizer.c 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/utf8.c 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/util.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src/vector.c 
+)
+
+add_executable(tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+)
+
+add_executable(main
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
+)
+
+target_include_directories(source 
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ThreadPool
+)
+
+target_include_directories(tests 
+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src
+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ThreadPool
+)
+
+target_include_directories(main 
+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/gumbo-parser/src
+ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ThreadPool
+)
+
+target_link_libraries(source Boost::boost Beast::Beast Boost::program_options OpenSSL::SSL OpenSSL::Crypto Boost::thread Boost::system Boost::log Boost::filesystem source)
+target_link_libraries(tests GTest::main Boost::boost Beast::Beast Boost::program_options OpenSSL::SSL OpenSSL::Crypto Boost::thread Boost::system Boost::log Boost::filesystem source)
+target_link_libraries(source Boost::boost Beast::Beast OpenSSL::SSL OpenSSL::Crypto Boost::program_options Boost::thread Boost::system Boost::log Boost::filesystem)
+
+enable_testing()
+add_test(NAME unit_tests COMMAND tests) 
+
+endif()

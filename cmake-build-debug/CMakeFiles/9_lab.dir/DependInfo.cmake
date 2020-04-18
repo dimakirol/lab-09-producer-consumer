@@ -4,14 +4,16 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "D:/Kirill/VUZ/4_Semestr/C++/group/lab-09-producer-consumer/sources/source.cpp" "D:/Kirill/VUZ/4_Semestr/C++/group/lab-09-producer-consumer/cmake-build-debug/CMakeFiles/lab_09_producer_consumer.dir/sources/source.cpp.obj"
-  "D:/Kirill/VUZ/4_Semestr/C++/group/lab-09-producer-consumer/tests/test.cpp" "D:/Kirill/VUZ/4_Semestr/C++/group/lab-09-producer-consumer/cmake-build-debug/CMakeFiles/lab_09_producer_consumer.dir/tests/test.cpp.obj"
+  "/home/kirill/Documents/4_semestr/lab-09-producer-consumer/sources/source.cpp" "/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/CMakeFiles/9_lab.dir/sources/source.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../include"
+  "/home/kirill/Documents/boost/installed/include/beast"
+  "/home/kirill/Documents/boost/installed/include"
+  "/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/include"
   )
 
 # Targets to which this target links.

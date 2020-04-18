@@ -48,10 +48,10 @@ RM = /home/kirill/Documents/Clion/clion-2019.3.4/bin/cmake/linux/bin/cmake -E re
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/kirill/Documents/4_semestr/lab-09-producer-consumer
+CMAKE_SOURCE_DIR = /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/_3rdParty/Hunter/toolchain
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug
+CMAKE_BINARY_DIR = /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/_3rdParty/Hunter/toolchain/_builds
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -69,8 +69,8 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/home/kirill/Documents/Clion/clion-2019.3.4/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/home/kirill/Documents/Clion/clion-2019.3.4/bin/cmake/linux/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/CMakeFiles /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/_3rdParty/Hunter/toolchain/_builds/CMakeFiles /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/_3rdParty/Hunter/toolchain/_builds/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/_3rdParty/Hunter/toolchain/_builds/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -110,46 +110,6 @@ depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-#=============================================================================
-# Target rules for targets named 9_lab
-
-# Build rule for target.
-9_lab: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 9_lab
-.PHONY : 9_lab
-
-# fast build rule for target.
-9_lab/fast:
-	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/build
-.PHONY : 9_lab/fast
-
-sources/source.o: sources/source.cpp.o
-
-.PHONY : sources/source.o
-
-# target to build an object file
-sources/source.cpp.o:
-	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/sources/source.cpp.o
-.PHONY : sources/source.cpp.o
-
-sources/source.i: sources/source.cpp.i
-
-.PHONY : sources/source.i
-
-# target to preprocess a source file
-sources/source.cpp.i:
-	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/sources/source.cpp.i
-.PHONY : sources/source.cpp.i
-
-sources/source.s: sources/source.cpp.s
-
-.PHONY : sources/source.s
-
-# target to generate assembly for a file
-sources/source.cpp.s:
-	$(MAKE) -f CMakeFiles/9_lab.dir/build.make CMakeFiles/9_lab.dir/sources/source.cpp.s
-.PHONY : sources/source.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -157,11 +117,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... 9_lab"
 	@echo "... edit_cache"
-	@echo "... sources/source.o"
-	@echo "... sources/source.i"
-	@echo "... sources/source.s"
 .PHONY : help
 
 

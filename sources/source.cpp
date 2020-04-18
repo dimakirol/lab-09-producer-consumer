@@ -13,6 +13,8 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/beast.hpp>
+#include <gumbo.h>
+
 
 namespace po=boost::program_options;
 
@@ -56,7 +58,7 @@ public:
         out = parameters.out;
         std::cout << url << std::endl << depth << std::endl
         << sites_in_work << std::endl << net_thread << std::endl
-        << pars_thread << std::endl << out;
+        << pars_thread << std::endl << out << std::endl;
 
         finish_him = false;
 

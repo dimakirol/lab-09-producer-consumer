@@ -1,4 +1,4 @@
-// Copyright 2018 Your Name <your_email>
+// Copyright 2019 dimakirol <your_email>
 
 #ifndef INCLUDE_HEADER_HPP_
 #define INCLUDE_HEADER_HPP_
@@ -6,6 +6,5 @@
 #ifndef BOOST_BEAST_EXAMPLE_COMMON_ROOT_CERTIFICATES_HPP
 #define BOOST_BEAST_EXAMPLE_COMMON_ROOT_CERTIFICATES_HPP
 
-#include <boost/asio/ssl.hpp>
-
+#endif // BOOST_BEAST_EXAMPLE_COMMON_ROOT_CERTIFICATES_HPP
 #endif // INCLUDE_HEADER_HPP_

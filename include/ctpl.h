@@ -21,27 +21,8 @@
 #ifndef __ctpl_thread_pool_H__
 #define __ctpl_thread_pool_H__
 
-#include <ThreadPool.h>
-#include <gumbo.h>
-#include <string_buffer.h>
-#include <boost/asio/connect.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/ssl/error.hpp>
-#include <boost/asio/ssl/stream.hpp>
-#include <boost/asio/ssl.hpp>
-#include <boost/beast.hpp>
-#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
-#include <boost/thread.hpp>
 
-#include "sertificate.hpp"
-#include <iostream>
-#include <deque>
-#include <string>
-#include <stdexcept>
-#include <vector>
-#include <condition_variable>
+#include <functional>
 #include <thread>
 
 #include <atomic>
@@ -51,19 +32,11 @@
 #include <future>
 #include <memory>
 #include <mutex>
-#include <thread>
 #include <vector>
 
 #ifndef _ctplThreadPoolLength_
 #define _ctplThreadPoolLength_ 100
 #endif
-
-using namespace std::chrono_literals;
-namespace beast = boost::beast;
-namespace http = beast::http;
-namespace net = boost::asio;
-namespace ssl = net::ssl;
-using tcp = net::ip::tcp; //↑ДАННЫЙ КУСОК ПОД ВОПРОСОМ
 
 // thread pool to run user's functors with signature
 //      ret func(int id, other_params)

@@ -3,12 +3,15 @@
 #include <header.hpp>
 #include <cstdlib>
 #include <ctpl.h>
+#include <vector>
+#include <string>
 #include <queue>
 #include <mutex>
 #include <atomic>
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <iterator> 
 #include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>

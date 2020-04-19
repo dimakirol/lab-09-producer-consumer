@@ -16,10 +16,23 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/beast.hpp>
+
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+#include <boost/asio/connect.hpp>
+#include <boost/asio/ip/tcp.hpp>
+
+#include <cstdlib>
 #include <gumbo.h>
 
 
 namespace po=boost::program_options;
+
+
+using tcp = boost::asio::ip::tcp;
+namespace http = boost::beast::http;
 
 struct _Params{
     std::string url;
@@ -98,6 +111,74 @@ private:
 //          else{
 //              std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
 //          }
+
+        try
+        {
+            // Check command line arguments.
+//            if(argc != 4 && argc != 5)
+//            {
+//                std::cerr <<
+//                          "Usage: http-client-sync <host> <port> <target> [<HTTP version: 1.0 or 1.1(default)>]\n" <<
+//                          "Example:\n" <<
+//                          "    http-client-sync www.example.com 80 /\n" <<
+//                          "    http-client-sync www.example.com 80 / 1.0\n";
+//                return EXIT_FAILURE;
+//            }
+            auto const host = "www.google.com";//ex: porhub.com
+            auto const port = 443; // 80 or 443
+            auto const target = "/"; // path in site (ex video is pornhub.com/kamaz => target = "/kamaz")
+            int version = 11;
+
+            // The io_context is required for all I/O
+            boost::asio::io_context ioc;
+
+            // These objects perform our I/O
+            tcp::resolver resolver{ioc};
+            tcp::socket socket{ioc};
+
+            // Look up the domain name
+            auto const results = resolver.resolve(host, port);
+
+            // Make the connection on the IP address we get from a lookup
+            boost::asio::connect(socket, results.begin(), results.end());
+
+            // Set up an HTTP GET request message
+            http::request<http::string_body> req{http::verb::get, target, version};
+            req.set(http::field::host, host);
+            req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+
+            // Send the HTTP request to the remote host
+            http::write(socket, req);
+
+            // This buffer is used for reading and must be persisted
+            boost::beast::flat_buffer buffer;
+
+            // Declare a container to hold the response
+            http::response<http::dynamic_body> res;
+
+            // Receive the HTTP response
+            http::read(socket, buffer, res);
+
+            // Write the message to standard out
+            std::cout << res << std::endl;
+
+            // Gracefully close the socket
+            boost::system::error_code ec;
+            socket.shutdown(tcp::socket::shutdown_both, ec);
+
+            // not_connected happens sometimes
+            // so don't bother reporting it.
+            //
+            if(ec && ec != boost::system::errc::not_connected)
+                throw boost::system::system_error{ec};
+
+            // If we get here then the connection is closed gracefully
+        }
+        catch(std::exception const& e)
+        {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return;
+        }
 
     }
     static void search_for_links(GumboNode* node, std::vector<std::string>& img_references, std::vector<std::string>& href_references) {

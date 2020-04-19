@@ -1,3 +1,4 @@
-ToolSet: 1.0 (local)Options: 
+ToolSet: w64 3.0 (local)@D:\Kirill\Files\mingw64
+Options: 
 
 Options:

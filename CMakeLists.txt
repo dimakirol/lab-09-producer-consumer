@@ -29,7 +29,7 @@ include_directories(include)
 set(BEAST_INCLUDE_DIR ${Boost_INCLUDE_DIR}/beast)
 include_directories(${BEAST_INCLUDE_DIR})
 
-find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options log log_setup thread)
+find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options coroutine log log_setup thread)
 
 hunter_add_package(gumbo)
 find_package(gumbo CONFIG REQUIRED)

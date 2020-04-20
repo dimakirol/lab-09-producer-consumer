@@ -3,7 +3,7 @@
 #ifndef INCLUDE_HEADER_HPP_
 #define INCLUDE_HEADER_HPP_
 
-#include "example/common/root_certificates.hpp"
+#include "root_certificates.hpp"
 
 #include <atomic>
 #include <chrono>
@@ -19,6 +19,7 @@
 #include <queue>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/coroutine/attributes.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -37,6 +38,9 @@
 #define HTTP_PORT "80"
 #define HTTPS_PORT "443"
 
+
+namespace po=boost::program_options;
+
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace net = boost::asio;            // from <boost/asio.hpp>
@@ -53,7 +57,7 @@ void do_session(
         int version,
         net::io_context& ioc,
         ssl::context& ctx,
-        net::yield_context yield
+        net::yield_context yield,
         std::string &web_page)
 {
     beast::error_code ec;
@@ -147,7 +151,8 @@ void do_session(
         return;
     }
 
-    web_page = res;
+    std::cout << res << std::endl;
+//    web_page = res;
     return;
 }
 
@@ -196,7 +201,7 @@ std::string get_https_page(std::string host, std::string port, std::string targe
     // the get operation is complete.
     ioc.run();
 
-    std::cout << web_page << std::endl;
+    //std::cout << web_page << std::endl;
     return web_page;
 }
 std::string get_http_page(std::string host, std::string port, std::string target){
@@ -265,7 +270,7 @@ std::string get_http_page(std::string host, std::string port, std::string target
     catch(std::exception const& e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
-        return;
+        return std::string("");
     }
 }
 

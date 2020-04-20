@@ -23,6 +23,18 @@
 //Build coverage
 BUILD_COVERAGE:BOOL=OFF
 
+//Boost coroutines library (debug)
+Boost_COROUTINES_LIBRARY_DEBUG:FILEPATH=Boost_COROUTINES_LIBRARY_DEBUG-NOTFOUND
+
+//Boost coroutines library (release)
+Boost_COROUTINES_LIBRARY_RELEASE:FILEPATH=Boost_COROUTINES_LIBRARY_RELEASE-NOTFOUND
+
+//Boost coroutine library (debug)
+Boost_COROUTINE_LIBRARY_DEBUG:FILEPATH=/home/kirill/Documents/boost/installed/lib/libboost_coroutine.so
+
+//Boost coroutine library (release)
+Boost_COROUTINE_LIBRARY_RELEASE:FILEPATH=/home/kirill/Documents/boost/installed/lib/libboost_coroutine.so
+
 //The directory containing a CMake configuration file for Boost.
 Boost_DIR:PATH=Boost_DIR-NOTFOUND
 
@@ -271,6 +283,15 @@ HUNTER_STATUS_PRINT:BOOL=ON
 //Enable/disable TLS certificate checking on downloads
 HUNTER_TLS_VERIFY:BOOL=ON
 
+//Path to a library.
+OPENSSL_CRYPTO_LIBRARY:FILEPATH=/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libcrypto.a
+
+//Path to a file.
+OPENSSL_INCLUDE_DIR:PATH=/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/include
+
+//Path to a library.
+OPENSSL_SSL_LIBRARY:FILEPATH=/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libssl.a
+
 //Path to a program.
 ProcessorCount_cmd_nproc:FILEPATH=/usr/bin/nproc
 
@@ -291,6 +312,14 @@ lab_09_producer_consumer_SOURCE_DIR:STATIC=/home/kirill/Documents/4_semestr/lab-
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: Boost_COROUTINES_LIBRARY_DEBUG
+Boost_COROUTINES_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_COROUTINES_LIBRARY_RELEASE
+Boost_COROUTINES_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_COROUTINE_LIBRARY_DEBUG
+Boost_COROUTINE_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_COROUTINE_LIBRARY_RELEASE
+Boost_COROUTINE_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_DIR
 Boost_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_LIBRARY_DIR_DEBUG
@@ -396,6 +425,14 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//Test CMAKE_HAVE_LIBC_PTHREAD
+CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=
+//Have library pthreads
+CMAKE_HAVE_PTHREADS_CREATE:INTERNAL=
+//Have library pthread
+CMAKE_HAVE_PTHREAD_CREATE:INTERNAL=1
+//Have include pthread.h
+CMAKE_HAVE_PTHREAD_H:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/kirill/Documents/4_semestr/lab-09-producer-consumer
@@ -460,6 +497,10 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding OpenSSL
+FIND_PACKAGE_MESSAGE_DETAILS_OpenSSL:INTERNAL=[/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libssl.a;/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libcrypto.a;dl][/home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/include][v1.1.1c()]
+//Details about finding Threads
+FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 HUNTER_CACHED_BUILD_SHARED_LIBS:INTERNAL=
 HUNTER_CACHED_CONFIGURATION_TYPES:INTERNAL=Release;Debug
 HUNTER_CACHED_ROOT:INTERNAL=/home/kirill/.hunter
@@ -468,12 +509,18 @@ HUNTER_SHA1:INTERNAL=9a3594a61227967fb92159339ba326701b287b19
 HUNTER_TOOLCHAIN_SHA1:INTERNAL=9b2c9d49ce6d44c594a9599b1cc4e40f8d278bc4
 HUNTER_URL:INTERNAL=https://github.com/cpp-pm/hunter/archive/v0.23.218.tar.gz
 HUNTER_VERSION:INTERNAL=0.23.218
+//ADVANCED property for variable: OPENSSL_CRYPTO_LIBRARY
+OPENSSL_CRYPTO_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENSSL_INCLUDE_DIR
+OPENSSL_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENSSL_SSL_LIBRARY
+OPENSSL_SSL_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ProcessorCount_cmd_nproc
 ProcessorCount_cmd_nproc-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ProcessorCount_cmd_sysctl
 ProcessorCount_cmd_sysctl-ADVANCED:INTERNAL=1
 //Components requested for this build tree.
-_Boost_COMPONENTS_SEARCHED:INTERNAL=log;log_setup;program_options;thread
+_Boost_COMPONENTS_SEARCHED:INTERNAL=coroutine;coroutines;log;log_setup;program_options;thread
 //Last used Boost_INCLUDE_DIR value.
 _Boost_INCLUDE_DIR_LAST:INTERNAL=/home/kirill/Documents/boost/installed/include
 //Last used Boost_LIBRARY_DIR_DEBUG value.

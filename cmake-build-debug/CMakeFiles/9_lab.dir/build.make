@@ -80,10 +80,13 @@ CMakeFiles/9_lab.dir/sources/source.cpp.s: cmake_force
 9_lab: CMakeFiles/9_lab.dir/sources/source.cpp.o
 9_lab: CMakeFiles/9_lab.dir/build.make
 9_lab: /home/kirill/Documents/boost/installed/lib/libboost_program_options.so
+9_lab: /home/kirill/Documents/boost/installed/lib/libboost_coroutine.so
 9_lab: /home/kirill/Documents/boost/installed/lib/libboost_log.so
 9_lab: /home/kirill/Documents/boost/installed/lib/libboost_log_setup.so
 9_lab: /home/kirill/Documents/boost/installed/lib/libboost_thread.so
 9_lab: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libgumbod.a
+9_lab: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libssl.a
+9_lab: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/libcrypto.a
 9_lab: CMakeFiles/9_lab.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable 9_lab"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/9_lab.dir/link.txt --verbose=$(VERBOSE)

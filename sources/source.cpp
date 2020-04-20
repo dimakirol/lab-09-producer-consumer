@@ -2,13 +2,6 @@
 
 #include <header.hpp>
 
-
-namespace po=boost::program_options;
-
-
-using tcp = boost::asio::ip::tcp;
-namespace http = boost::beast::http;
-
 struct _Params{
     std::string url;
     uint32_t depth;
@@ -90,7 +83,7 @@ private:
         get_http_page("www.google.com", HTTP_PORT, "/");
         for (int i = 0; i < 5; ++i)
             std::cout << std::endl;
-        get_https_page("www.ya.ru", HTTPS_PORT, "/");
+        get_https_page("google.com", HTTPS_PORT, "/");
 
     }
     static void search_for_links(GumboNode* node, std::vector<std::string>& img_references, std::vector<std::string>& href_references) {

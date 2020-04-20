@@ -125,7 +125,7 @@ private:
 //                return EXIT_FAILURE;
 //            }
             auto const host = "www.google.com";//ex: porhub.com
-            auto const port = 443; // 80 or 443
+            auto const port = "80"; // 80! or 443
             auto const target = "/"; // path in site (ex video is pornhub.com/kamaz => target = "/kamaz")
             int version = 11;
 
@@ -161,6 +161,9 @@ private:
 
             // Write the message to standard out
             std::cout << res << std::endl;
+            std::ofstream fi("shit.txt");
+            fi << res;
+            fi.close();
 
             // Gracefully close the socket
             boost::system::error_code ec;
@@ -316,7 +319,7 @@ public:
             download_queue->push(download_this(url, (depth - 1)));
             network_threads.push(std::bind(&MyCrawler::downloading_pages, this, &network_threads));
 
-            parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this, &parsing_threads));
+            //parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this, &parsing_threads));
         } catch (std::logic_error const& e){
             std::cout << e.what();
         } catch (...){

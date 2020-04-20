@@ -87,76 +87,10 @@ private:
 //              std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
 //          }
 
-        try
-        {
-            // Check command line arguments.
-//            if(argc != 4 && argc != 5)
-//            {
-//                std::cerr <<
-//                          "Usage: http-client-sync <host> <port> <target> [<HTTP version: 1.0 or 1.1(default)>]\n" <<
-//                          "Example:\n" <<
-//                          "    http-client-sync www.example.com 80 /\n" <<
-//                          "    http-client-sync www.example.com 80 / 1.0\n";
-//                return EXIT_FAILURE;
-//            }
-            auto const host = "www.google.com";//ex: porhub.com
-            auto const port = "80"; // 80! or 443
-            auto const target = "/"; // path in site (ex video is pornhub.com/kamaz => target = "/kamaz")
-            int version = 11;
-
-            // The io_context is required for all I/O
-            boost::asio::io_context ioc;
-
-            // These objects perform our I/O
-            tcp::resolver resolver{ioc};
-            tcp::socket socket{ioc};
-
-            // Look up the domain name
-            auto const results = resolver.resolve(host, port);
-
-            // Make the connection on the IP address we get from a lookup
-            boost::asio::connect(socket, results.begin(), results.end());
-
-            // Set up an HTTP GET request message
-            http::request<http::string_body> req{http::verb::get, target, version};
-            req.set(http::field::host, host);
-            req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-
-            // Send the HTTP request to the remote host
-            http::write(socket, req);
-
-            // This buffer is used for reading and must be persisted
-            boost::beast::flat_buffer buffer;
-
-            // Declare a container to hold the response
-            http::response<http::dynamic_body> res;
-
-            // Receive the HTTP response
-            http::read(socket, buffer, res);
-
-            // Write the message to standard out
-            std::cout << res << std::endl;
-            std::ofstream fi("shit.txt");
-            fi << res;
-            fi.close();
-
-            // Gracefully close the socket
-            boost::system::error_code ec;
-            socket.shutdown(tcp::socket::shutdown_both, ec);
-
-            // not_connected happens sometimes
-            // so don't bother reporting it.
-            //
-            if(ec && ec != boost::system::errc::not_connected)
-                throw boost::system::system_error{ec};
-
-            // If we get here then the connection is closed gracefully
-        }
-        catch(std::exception const& e)
-        {
-            std::cerr << "Error: " << e.what() << std::endl;
-            return;
-        }
+        get_http_page("www.google.com", HTTP_PORT, "/");
+        for (int i = 0; i < 5; ++i)
+            std::cout << std::endl;
+        get_https_page("www.ya.ru", HTTPS_PORT, "/");
 
     }
     static void search_for_links(GumboNode* node, std::vector<std::string>& img_references, std::vector<std::string>& href_references) {
@@ -258,7 +192,6 @@ private:
         gumbo_destroy_output(&kGumboDefaultOptions, output);
     }
     void writing_output(){
-        return;
         std::ofstream ostream;
         ostream.open(out, std::ios::out);
         while (!finish_him.load()) {
@@ -290,7 +223,7 @@ public:
             ctpl::thread_pool network_threads(net_thread);
             ctpl::thread_pool parsing_threads(pars_thread);
 
-            writing_output();
+            //writing_output();
             download_queue->push(download_this(url, (depth - 1)));
             network_threads.push(std::bind(&MyCrawler::downloading_pages, this, &network_threads));
 

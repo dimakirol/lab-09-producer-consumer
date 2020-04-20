@@ -34,6 +34,9 @@ find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options log log_setup thre
 hunter_add_package(gumbo)
 find_package(gumbo CONFIG REQUIRED)
 
+hunter_add_package(OpenSSL)
+find_package(OpenSSL REQUIRED)
+
 
 add_executable(9_lab
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
@@ -46,6 +49,6 @@ target_include_directories(9_lab
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-target_link_libraries(9_lab ${Boost_LIBRARIES} gumbo::gumbo)
+target_link_libraries(9_lab ${Boost_LIBRARIES} gumbo::gumbo OpenSSL::SSL)
 
 link_directories("${Boost_Path}/installed/lib")

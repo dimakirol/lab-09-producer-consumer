@@ -1,31 +1,6 @@
 // Copyright 2019 dimakirol <your_email>
 
 #include <header.hpp>
-#include <cstdlib>
-#include <ctpl.h>
-#include <vector>
-#include <string>
-#include <queue>
-#include <mutex>
-#include <atomic>
-#include <chrono>
-#include <fstream>
-#include <iostream>
-#include <iterator> 
-#include <boost/thread/thread.hpp>
-#include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/beast.hpp>
-
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
-#include <boost/asio/connect.hpp>
-#include <boost/asio/ip/tcp.hpp>
-
-#include <cstdlib>
-#include <gumbo.h>
 
 
 namespace po=boost::program_options;

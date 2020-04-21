@@ -14,26 +14,47 @@ typedef struct _Params Params;
 struct _download_this{
     _download_this(){
         url = std::string("");
+        target = std::string("/");
         current_depth = 0;
+    }
+    _download_this(std::string link, std::string path_in_server,
+            uint32_t _current_depth, bool _protocol){
+        url = link;
+        target = path_in_server;
+        current_depth = _current_depth;
+        protocol = _protocol;
+    }
+    _download_this(std::string link, std::string path_in_server, uint32_t _current_depth){
+        url = link;
+        target = path_in_server;
+        current_depth = _current_depth;
+        protocol = true;
     }
     _download_this(std::string link, uint32_t _current_depth){
         url = link;
+        target = std::string("/");
         current_depth = _current_depth;
+        protocol = true;
     }
     std::string url;
+    std::string target;
     uint32_t current_depth;
+    bool protocol;
 };
 typedef struct _download_this download_this;
 
 struct _parse_this{
     _parse_this(){
+        url = std::string("");
         website = std::string("");
         current_depth = 0;
     }
-    _parse_this(std::string site, uint32_t _current_depth){
-        website = site;
+    _parse_this(std::string link, std::string page, uint32_t _current_depth){
+        url = link;
+        website = page;
         current_depth = _current_depth;
     }
+    std::string url;
     std::string website;
     uint32_t current_depth;
 };
@@ -66,7 +87,6 @@ public:
 
 private:
     void downloading_pages(ctpl::thread_pool *network_threads){
-        std::cout << "Kukuxa uletela" << std::endl;
         //Псевдокод
 //        while((!finish_him.load()) && (sites_in_work))
 //          while (!safe_downloads.try_lock())
@@ -79,12 +99,43 @@ private:
 //          else{
 //              std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
 //          }
+        bool empty_queue = true;
+        while(empty_queue && !finish_him.load()) {
+            while (!safe_downloads.try_lock())
+                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+            empty_queue = download_queue->empty();
+            safe_downloads.unlock();
+        }
+        if (finish_him.load())
+            return;
+//        network_threads->push(std::bind(&MyCrawler::downloading_pages, this, network_threads));
 
-        get_http_page("www.google.com", HTTP_PORT, "/");
-        for (int i = 0; i < 5; ++i)
-            std::cout << std::endl;
-        get_https_page("www.google.com", HTTPS_PORT, "/");
+        while (!safe_downloads.try_lock())
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+        download_this url_to_download = download_queue->front();
+        download_queue->pop();
+        safe_downloads.unlock();
 
+        std::string website("");
+        if (url_to_download.protocol){
+            website = get_https_page(("www." + url_to_download.url),
+                                     HTTPS_PORT, url_to_download.target);
+            if (website == std::string("404"))
+                website = get_https_page(url_to_download.url,
+                                         HTTPS_PORT, url_to_download.target);
+        }
+        else {
+            website = get_http_page(("www." + url_to_download.url),
+                    HTTP_PORT, url_to_download.target);
+        }
+        std::cout << website;
+        std::cout << std::endl;
+
+        parse_this site(url_to_download.url, website, url_to_download.current_depth);
+        while (!safe_processing.try_lock())
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+        processing_queue->push(site);
+        safe_processing.unlock();
     }
     static void search_for_links(GumboNode* node, std::vector<std::string>& img_references, std::vector<std::string>& href_references) {
         if (node->type != GUMBO_NODE_ELEMENT) {
@@ -217,7 +268,8 @@ public:
             ctpl::thread_pool parsing_threads(pars_thread);
 
             //writing_output();
-            download_queue->push(download_this(url, (depth - 1)));
+
+            download_queue->push(download_this(url,(depth - 1)));
             network_threads.push(std::bind(&MyCrawler::downloading_pages, this, &network_threads));
 
             //parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this, &parsing_threads));

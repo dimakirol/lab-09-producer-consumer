@@ -80,24 +80,20 @@ std::string get_https_page(std::string host, std::string port, std::string targe
         http::read(stream, buffer, res);
         web_page =  boost::beast::buffers_to_string(res.body().data());
     } catch (...) {
-        std::cout << "Error in https downloading page";
-        return "Error in https downloading page";
+        std::cout << "Error in https downloading page ";
+        return "404";
     }
     return web_page;
 }
 std::string get_http_page(std::string host, std::string port, std::string target){
+    std::string web_site("");
     try
     {
-        // Check command line arguments.
-//            if(argc != 4 && argc != 5)
-//            {
-//                std::cerr <<
+
 //                          "Usage: http-client-sync <host> <port> <target> [<HTTP version: 1.0 or 1.1(default)>]\n" <<
 //                          "Example:\n" <<
 //                          "    http-client-sync www.example.com 80 /\n" <<
 //                          "    http-client-sync www.example.com 80 / 1.0\n";
-//                return EXIT_FAILURE;
-//            }
 //        auto const host = "www.google.com";//ex: porhub.com
 //        auto const port = "80"; // 80! or 443
 //        auto const target = "/"; // path in site (ex video is pornhub.com/kamaz => target = "/kamaz")
@@ -134,7 +130,7 @@ std::string get_http_page(std::string host, std::string port, std::string target
         http::read(socket, buffer, res);
 
         // Write the message to standard out
-        std::cout << res << std::endl;
+        web_site = boost::beast::buffers_to_string(res.body().data());
 
         // Gracefully close the socket
         boost::system::error_code ec;
@@ -142,7 +138,7 @@ std::string get_http_page(std::string host, std::string port, std::string target
 
         // not_connected happens sometimes
         // so don't bother reporting it.
-        //
+
         if(ec && ec != boost::system::errc::not_connected)
             throw boost::system::system_error{ec};
 
@@ -151,8 +147,10 @@ std::string get_http_page(std::string host, std::string port, std::string target
     catch(std::exception const& e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
-        return std::string("");
+        web_site = std::string("404");
     }
+    return  web_site;
 }
+
 
 #endif // INCLUDE_HEADER_HPP_

@@ -92,6 +92,9 @@
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/include/header.hpp">
 			<Option target="lab_09_producer_consumer"/>
 		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/include/root_certificates.hpp">
+			<Option target="lab_09_producer_consumer"/>
+		</Unit>
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/sources/source.cpp">
 			<Option target="lab_09_producer_consumer"/>
 		</Unit>

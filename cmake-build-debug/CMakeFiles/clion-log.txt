@@ -1,17 +1,12 @@
-/home/kirill/Documents/Clion/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/kirill/Documents/4_semestr/lab-09-producer-consumer
--- Boost version: 1.72.0
--- Found the following Boost libraries:
---   program_options
---   coroutine
---   log
---   log_setup
---   thread
--- [hunter] Calculating Toolchain-SHA1
--- [hunter] Calculating Config-SHA1
--- [hunter] HUNTER_ROOT: /home/kirill/.hunter
--- [hunter] [ Hunter-ID: 9a3594a | Toolchain-ID: 9b2c9d4 | Config-ID: 48401e9 ]
--- [hunter] GUMBO_ROOT: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install (ver.: 0.10.1)
--- [hunter] OPENSSL_ROOT: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install (ver.: 1.1.1c)
--- Configuring done
--- Generating done
--- Build files have been written to: /home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug
+"C:\Program Files\JetBrains\CLion 2019.3.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" D:\Kirill\VUZ\4_Semestr\C++\group\lab-09-producer-consumer
+CMake Error at CMakeLists.txt:11 (include):
+  include could not find load file:
+
+    tools/gate/cmake/HunterGate.cmake
+
+
+CMake Error at CMakeLists.txt:14 (HunterGate):
+  Unknown CMake command "HunterGate".
+
+
+-- Configuring incomplete, errors occurred!

@@ -158,7 +158,7 @@ void do_session(
 
 //------------------------------------------------------------------------------
 
-std::string get_https_page(std::string host, std::string port, std::string target)
+std::string get_https_page(std::string _host, std::string _port, std::string _target)
 {
     // Check command line arguments.
 //    if(argc != 4 && argc != 5)
@@ -170,7 +170,10 @@ std::string get_https_page(std::string host, std::string port, std::string targe
 //                  "    http-client-coro-ssl www.example.com 443 / 1.0\n";
 //        return EXIT_FAILURE;
 //    }
-    int version = 11;
+    auto const host = "www.google.com";//ex: porhub.com
+    auto const port = "443"; // 80! or 443
+    auto const target = "/";
+    int version = 10;
 
     // The io_context is required for all I/O
     net::io_context ioc;

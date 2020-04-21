@@ -194,7 +194,7 @@ private:
       }
     }
 
-    std::cout << "qq" << std::endl;
+//    std::cout << "qq" << std::endl;
 
     for (auto j = href_references.begin(); j != href_references.end();) {
         if ((j->find(".jpg") != std::string::npos) ||
@@ -206,8 +206,10 @@ private:
             j = href_references.erase(j);
         } else if (j->find("://") != std::string::npos) {
             if (j->find("/", j->find("://") + 3) != std::string::npos) {
+
                 paths_in_hrefs.push_back(j->substr(
                         j->find("/", j->find("://") + 3), std::string::npos));
+
                 *j = j->substr(0, j->find("/", j->find("://") + 3));
                 if (j->find("/") == std::string::npos) {
                     paths_in_hrefs.emplace_back("/");
@@ -221,7 +223,7 @@ private:
             ++j;
         }
     }
-    std::cout << href_references.size() << "|" << paths_in_hrefs.size() << std::endl;
+//    std::cout << href_references.size() << "|" << paths_in_hrefs.size() << std::endl;
     for (auto j = paths_in_hrefs.begin(); j != paths_in_hrefs.end();) {
         if (j->find("#") == 0) {
             *j = "/";

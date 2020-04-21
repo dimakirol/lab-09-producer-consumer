@@ -137,65 +137,105 @@ private:
         processing_queue->push(site);
         safe_processing.unlock();
     }
-    static void search_for_links(GumboNode* node, std::vector<std::string>& img_references, std::vector<std::string>& href_references) {
-        if (node->type != GUMBO_NODE_ELEMENT) {
-            return;
-        }
-        GumboAttribute* ref;
-        if (node->v.element.tag == GUMBO_TAG_A &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
-            href_references.push_back(std::string(ref->value));
-        }
+    static void search_for_links(GumboNode* node, 
+                                 std::vector<std::string>& img_references, 
+                                 std::vector<std::string>& href_references) {
+    if (node->type != GUMBO_NODE_ELEMENT) {
+        return;
+    }
+    GumboAttribute* ref;
+    if (((node->v.element.tag == GUMBO_TAG_A) || (node->v.element.tag == GUMBO_TAG_LINK)) &&
+        (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
+        href_references.push_back(std::string(ref->value));
+    }
 
-        if (node->v.element.tag == GUMBO_TAG_META &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "contents"))) {
+    if (node->v.element.tag == GUMBO_TAG_META &&
+        (ref = gumbo_get_attribute(&node->v.element.attributes, "contents"))) {
+        img_references.push_back(std::string(ref->value));
+    }
+
+    if (node->v.element.tag == GUMBO_TAG_HTML &&
+        (ref = gumbo_get_attribute(&node->v.element.attributes, "itemtype"))) {
+        href_references.push_back(std::string(ref->value));
+    }
+
+    if (node->v.element.tag == GUMBO_TAG_IMG &&
+        (ref = gumbo_get_attribute(&node->v.element.attributes, "src"))) {
+        img_references.push_back(std::string(ref->value));
+    }
+
+    if (node->v.element.tag == GUMBO_TAG_INPUT &&
+        (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))) {
+        if (std::string(ref->value) == "image") {
+            ref = gumbo_get_attribute(&node->v.element.attributes, "src");
             img_references.push_back(std::string(ref->value));
-        }
-
-        if (node->v.element.tag == GUMBO_TAG_IMG &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "src"))) {
-            img_references.push_back(std::string(ref->value));
-        }
-
-        if (node->v.element.tag == GUMBO_TAG_INPUT &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))) {
-            if (std::string(ref->value) == "image") {
-                ref = gumbo_get_attribute(&node->v.element.attributes, "src");
-                img_references.push_back(std::string(ref->value));
-            }
-        }
-
-        GumboVector* children = &node->v.element.children;
-        for (unsigned int i = 0; i < children->length; ++i) {
-            search_for_links(static_cast<GumboNode*>(children->data[i]), img_references, href_references);
         }
     }
 
-    void all_right_img_references(std::vector<std::string>& img_references, std::vector<std::string>& href_references) {
-        /*
-        for (auto& i = img_references.begin(); i != img_references.end();) {
-          if ((i->find(".jpg") == npos) || (i->find(".png") == npos)) {
-              i = img_references.erase(i);
-          } else {
-              ++i;
-          }
-        }
-    */
+    GumboVector* children = &node->v.element.children;
+    for (unsigned int i = 0; i < children->length; ++i) {
+        search_for_links(static_cast<GumboNode*>(children->data[i]), img_references, href_references);
+    }
+}
 
-        for (auto j = href_references.begin(); j != href_references.end();) {
-            if ((j->find(".jpg") != std::string::npos) || (j->find(".png") != std::string::npos)) {
-                img_references.push_back(*j);
-                j = href_references.erase(j);
-            } else {
-                ++j;
+    void all_right_references(std::vector<std::string>& img_references,
+                          std::vector<std::string>& href_references,
+                          std::vector<std::string>& paths_in_hrefs,
+                          std::string& site) {
+    for (auto i = img_references.begin(); i != img_references.end();) {
+      if ((i->find(".jpg") != std::string::npos) ||
+          (i->find(".png") != std::string::npos) ||
+          (i->find(".gif") != std::string::npos) ||
+          (i->find(".ico") != std::string::npos) ||
+          (i->find(".svg") != std::string::npos)) {
+        i = img_references.erase(i);
+      } else {
+        ++i;
+      }
+    }
+
+    std::cout << "qq" << std::endl;
+
+    for (auto j = href_references.begin(); j != href_references.end();) {
+        if ((j->find(".jpg") != std::string::npos) ||
+            (j->find(".png") != std::string::npos) ||
+            (j->find(".gif") != std::string::npos) ||
+            (j->find(".svg") != std::string::npos) ||
+            (j->find(".ico") != std::string::npos)) {
+            img_references.push_back(*j);
+            j = href_references.erase(j);
+        } else if (j->find("://") != std::string::npos) {
+            if (j->find("/", j->find("://") + 3) != std::string::npos) {
+                paths_in_hrefs.push_back(j->substr(
+                        j->find("/", j->find("://") + 3), std::string::npos));
+                *j = j->substr(0, j->find("/", j->find("://") + 3));
+                if (j->find("/") == std::string::npos) {
+                    paths_in_hrefs.emplace_back("/");
+                }
             }
+            ++j;
+        } else if (j->find("/") == 0) {
+            paths_in_hrefs.push_back(*j);
+            *j = site;
+        } else {
+            ++j;
         }
     }
+    std::cout << href_references.size() << "|" << paths_in_hrefs.size() << std::endl;
+    for (auto j = paths_in_hrefs.begin(); j != paths_in_hrefs.end();) {
+        if (j->find("#") == 0) {
+            *j = "/";
+        }
+        ++j;
+    }
+
+}
  
     void parsing_pages(ctpl::thread_pool *parsing_threads) {
         //without finish_him
         //parsing_threads->push(std::bind(&MyCrawler::parsing_pages, this, parsing_threads));
         std::string site_to_parse;
+        std::string main_site;
         uint32_t current_depth;
         download_this download_package;
         
@@ -208,30 +248,41 @@ private:
         
         std::vector<std::string> img_references;
         std::vector<std::string> href_references;
-
+        std::vector<std::string> paths_in_hrefs;
+        
         GumboOutput* output = gumbo_parse(site_to_parse.c_str());
         search_for_links(output->root, img_references, href_references);
-        all_right_img_references(img_references, href_references);
+        all_right_references(img_references, href_references, paths_in_hrefs, main_site);
+        for (auto j = href_references.begin(); j != href_references.end();) {
+            if ((j->find("://") != std::string::npos)) {
+                *j = j->substr(j->find("://") + 3, std::string::npos);
+            }
+            if (j->find("www.") != std::string::npos) {
+                *j = j->substr(j->find("www.") + 4, std::string::npos);
+            }
+            ++j;
+        }
         
         if (current_depth) {
-            while (!safe_downloads.try_lock())
-                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
             while (!href_references.empty()) {
                 download_package.url = href_references[href_references.size() - 1];
                 download_package.current_depth = current_depth - 1;
                 download_queue->push(download_package);
+                while (!safe_downloads.try_lock())
+                    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
                 href_references.pop_back();
+                safe_downloads.unlock();
             }
-            safe_downloads.unlock();
         }
 
-        while (!safe_output.try_lock())
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+        
         while (!img_references.empty()) {
+            while (!safe_output.try_lock())
+                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
             output_queue->push(img_references[img_references.size() - 1]);
+            safe_downloads.unlock();
             img_references.pop_back();
         }
-        safe_downloads.unlock();
         
         gumbo_destroy_output(&kGumboDefaultOptions, output);
     }

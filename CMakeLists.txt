@@ -39,8 +39,8 @@ find_package(gumbo CONFIG REQUIRED)
 hunter_add_package(OpenSSL)
 find_package(OpenSSL REQUIRED)
 
-hunter_add_package(Boost COMPONENTS program_options coroutine log log_setup thread)
-find_package(Boost 1.70.0 COMPONENTS REQUIRED program_options coroutine log log_setup thread)
+hunter_add_package(Boost COMPONENTS program_options coroutine log thread)
+find_package(Boost 1.70.0 COMPONENTS REQUIRED program_options coroutine log thread)
 
 add_library(9_lab STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp

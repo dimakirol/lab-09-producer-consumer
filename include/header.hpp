@@ -50,7 +50,8 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 namespace ssl = boost::asio::ssl;       // from <boost/asio/ssl.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
-std::string get_https_page(std::string host, std::string port, std::string target)
+std::string get_https_page(std::string host, std::string port,
+                           std::string target)
 {
 
     std::string web_page("");
@@ -64,14 +65,15 @@ std::string get_https_page(std::string host, std::string port, std::string targe
         ssl::stream<tcp::socket> stream{ioc, ctx};
         if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str())) {
             boost::system::error_code ec{static_cast<int>(::ERR_get_error()),
-                                         boost::asio::error::get_ssl_category()};
+                                      boost::asio::error::get_ssl_category()};
             throw boost::system::system_error{ec};
         }
         auto const results = resolver.resolve(host, port);
         boost::asio::connect(stream.next_layer(), results.begin(),
                              results.end());
         stream.handshake(ssl::stream_base::client);
-        http::request<http::string_body> req{http::verb::get, target, version};
+        http::request<http::string_body> req{http::verb::get, target,
+                                                      version};
         req.set(http::field::host, host);
         req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         http::write(stream, req);
@@ -84,23 +86,15 @@ std::string get_https_page(std::string host, std::string port, std::string targe
                                << host << target << std::endl;
         return "404";
     } catch (...) {
-        std::cout << "Error in https downloading page " << host << target << std::endl;
         return "404";
     }
     return web_page;
 }
-std::string get_http_page(std::string host, std::string port, std::string target){
+std::string get_http_page(std::string host, std::string port,
+                          std::string target){
     std::string web_site("");
     try
     {
-
-//                          "Usage: http-client-sync <host> <port> <target> [<HTTP version: 1.0 or 1.1(default)>]\n" <<
-//                          "Example:\n" <<
-//                          "    http-client-sync www.example.com 80 /\n" <<
-//                          "    http-client-sync www.example.com 80 / 1.0\n";
-//        auto const host = "www.google.com";//ex: porhub.com
-//        auto const port = "80"; // 80! or 443
-//        auto const target = "/"; // path in site (ex video is pornhub.com/kamaz => target = "/kamaz")
         int version = 11;
 
         // The io_context is required for all I/O
@@ -117,7 +111,8 @@ std::string get_http_page(std::string host, std::string port, std::string target
         boost::asio::connect(socket, results.begin(), results.end());
 
         // Set up an HTTP GET request message
-        http::request<http::string_body> req{http::verb::get, target, version};
+        http::request<http::string_body> req{http::verb::get, target,
+                                                     version};
         req.set(http::field::host, host);
         req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 

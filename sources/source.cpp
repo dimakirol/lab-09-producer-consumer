@@ -24,7 +24,8 @@ struct _download_this{
         current_depth = _current_depth;
         protocol = _protocol;
     }
-    _download_this(std::string link, std::string path_in_server, uint32_t _current_depth){
+    _download_this(std::string link, std::string path_in_server,
+                   uint32_t _current_depth){
         url = link;
         target = path_in_server;
         current_depth = _current_depth;
@@ -76,9 +77,6 @@ public:
         net_thread = parameters.net_thread;
         pars_thread = parameters.pars_thread;
         out = parameters.out;
-        std::cout << url << std::endl << depth << std::endl
-        << sites_in_work.load() << std::endl << net_thread << std::endl
-        << pars_thread << std::endl << out << std::endl;
 
         finish_him = false;
 
@@ -94,32 +92,23 @@ public:
 
 private:
     void downloading_pages(ctpl::thread_pool *network_threads){
-        //Псевдокод
-//        while((!finish_him.load()) && (sites_in_work))
-//          while (!safe_downloads.try_lock())
-//            std::this_thread::sleep_for(std::chrono::milliseconds(id+1));
-//          if (!download_queue->empty()){
-//               download_this work_in_process = download_queue.pop();
-//               network_threads->push(std::bind(&MyCrawler::downloading_pages, this, network_threads));
-//               downloading...
-//          }
-//          else{
-//              std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5));
-//          }
-
         bool empty_queue = true;
         while(empty_queue && !finish_him.load()) {
-            while (!safe_downloads.try_lock())
-                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+            while (!safe_downloads.try_lock()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(
+                                       rand() % 5));
+            }
             empty_queue = download_queue->empty();
             safe_downloads.unlock();
         }
-        if (finish_him.load())
+        if (finish_him.load()) {
             return;
+        }
 
-
-        while (!safe_downloads.try_lock())
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+        while (!safe_downloads.try_lock()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(
+                                         rand() % 5));
+        }
         download_this url_to_download = download_queue->front();
         download_queue->pop();
         safe_downloads.unlock();
@@ -127,30 +116,33 @@ private:
         network_threads->push(std::bind(&MyCrawler::downloading_pages,
                 this, network_threads));
 
-        std::cout << "A Thread " << url_to_download.url << url_to_download.target << std::endl;
         std::mutex down_load;
         std::string website("");
         down_load.lock();
         if (url_to_download.protocol){
             website = get_https_page(url_to_download.url,
                                      HTTPS_PORT, url_to_download.target);
-            if ((website == std::string("404")) || (website == std::string("")) ||
-                    (website.find("301 Moved Permanently") != std::string::npos))
+            if ((website == std::string("404")) ||
+                   (website == std::string("")) ||
+                   (website.find("301 Moved Permanently")
+                                                   != std::string::npos)) {
                 website = get_https_page(("www." + url_to_download.url),
                                          HTTPS_PORT, url_to_download.target);
-        }
-        else {
+            }
+        } else {
             website = get_http_page(("www." + url_to_download.url),
                     HTTP_PORT, url_to_download.target);
         }
         down_load.unlock();
         parse_this site(url_to_download.url, url_to_download.target,
-                website, url_to_download.current_depth, url_to_download.protocol);
-        while (!safe_processing.try_lock())
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+                website, url_to_download.current_depth,
+                url_to_download.protocol);
+        while (!safe_processing.try_lock()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(
+                                        rand() % 5));
+        }
         processing_queue->push(site);
         safe_processing.unlock();
-        std::cout << "1" << std::endl;
     }
     static void search_for_links(GumboNode* node, 
                                  std::vector<std::string>& img_references, 
@@ -159,18 +151,21 @@ private:
             return;
         }
         GumboAttribute* ref;
-        if (((node->v.element.tag == GUMBO_TAG_A) || (node->v.element.tag == GUMBO_TAG_LINK)) &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
+        if (((node->v.element.tag == GUMBO_TAG_A) ||
+            (node->v.element.tag == GUMBO_TAG_LINK)) &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes,"href"))) {
             href_references.push_back(std::string(ref->value));
         }
 
         if (node->v.element.tag == GUMBO_TAG_META &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "contents"))) {
+            (ref = gumbo_get_attribute(&node->v.element.attributes,
+                    "contents"))) {
             img_references.push_back(std::string(ref->value));
         }
 
         if (node->v.element.tag == GUMBO_TAG_HTML &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "itemtype"))) {
+            (ref = gumbo_get_attribute(&node->v.element.attributes,
+                    "itemtype"))) {
             href_references.push_back(std::string(ref->value));
         }
 
@@ -180,7 +175,7 @@ private:
         }
 
         if (node->v.element.tag == GUMBO_TAG_INPUT &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))) {
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))){
             if (std::string(ref->value) == "image") {
                 ref = gumbo_get_attribute(&node->v.element.attributes, "src");
                 img_references.push_back(std::string(ref->value));
@@ -189,7 +184,8 @@ private:
 
         GumboVector* children = &node->v.element.children;
         for (unsigned int i = 0; i < children->length; ++i) {
-            search_for_links(static_cast<GumboNode*>(children->data[i]), img_references, href_references);
+            search_for_links(static_cast<GumboNode*>(children->data[i]),
+                    img_references, href_references);
         }
     }
 
@@ -238,7 +234,8 @@ private:
             } else if (j->find("://") != std::string::npos) {
                 if (j->find("/", j->find("://") + 3) != std::string::npos) {
                     paths_in_hrefs.push_back(j->substr(
-                            j->find("/", j->find("://") + 3), std::string::npos));
+                            j->find("/", j->find("://") + 3),
+                                          std::string::npos));
                     *j = j->substr(0, j->find("/", j->find("://") + 3));
                 } else {
                     paths_in_hrefs.emplace_back("/");
@@ -266,7 +263,8 @@ private:
         }
     }
  
-    void about_https(std::vector<bool>& https_protocol, std::vector<std::string>& href_references) {
+    void about_https(std::vector<bool>& https_protocol,
+                     std::vector<std::string>& href_references) {
         for (auto j = href_references.begin(); j != href_references.end();) {
             if ((j->find("://") != std::string::npos)) {
                 if (j->find("https://") == 0) {
@@ -288,26 +286,29 @@ private:
         bool empty_queue = true;
         while(empty_queue && !finish_him.load()) {
             while (!safe_processing.try_lock())
-                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+                std::this_thread::sleep_for(
+                        std::chrono::milliseconds(rand() % 4));
             empty_queue = processing_queue->empty();
             safe_processing.unlock();
         }
-        if (finish_him.load())
+        if (finish_him.load()) {
             return;
+        }
 
         download_this download_package;
         parse_this parse_package;
-        std::cout << "2: sites in work " << sites_in_work.load() << std::endl;
-        while (!safe_processing.try_lock())
-            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+
+        while (!safe_processing.try_lock()) {
+            std::this_thread::sleep_for(
+                    std::chrono::milliseconds(rand() % 4));
+        }
         parse_package = processing_queue->front();
         processing_queue->pop();
         safe_processing.unlock();
-//https://avatars.mds.yandex.net/get-yablogs/41243/file_1587649458680/orig done on ya.ru
-        parsing_threads->push(std::bind(&MyCrawler::parsing_pages, this, parsing_threads));
 
-        std::cout << "parse Thread " << parse_package.url << parse_package.target << std::endl;
-        std::cout << "3" << std::endl;
+        parsing_threads->push(std::bind(&MyCrawler::parsing_pages,
+                              this, parsing_threads));
+
         std::vector<std::string> img_references;
         std::vector<std::string> href_references;
         std::vector<std::string> paths_in_hrefs;
@@ -316,19 +317,27 @@ private:
         GumboOutput* output = gumbo_parse(parse_package.website.c_str());
         search_for_links(output->root, img_references, href_references);
         true_site(parse_package.url, parse_package.protocol);
-        all_right_references(img_references, href_references, paths_in_hrefs, parse_package.url, parse_package.target);
+        all_right_references(img_references, href_references,
+                             paths_in_hrefs, parse_package.url,
+                                 parse_package.target);
         about_https(https_protocol, href_references);
-        std::cout << depth << "   " << parse_package.current_depth << std::endl;
+
         if (parse_package.current_depth) {
             if (!href_references.empty()) {
                 bool first_one = true;
                 while (!href_references.empty()) {
-                    download_package.url = href_references[href_references.size() - 1];
-                    download_package.current_depth = parse_package.current_depth - 1;
-                    download_package.target = paths_in_hrefs[paths_in_hrefs.size() - 1];
-                    download_package.protocol = https_protocol[https_protocol.size() - 1];
-                    while (!safe_downloads.try_lock())
-                        std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+                    download_package.url = href_references[
+                                                  href_references.size() - 1];
+                    download_package.current_depth =
+                            parse_package.current_depth - 1;
+                    download_package.target = paths_in_hrefs[
+                                                   paths_in_hrefs.size() - 1];
+                    download_package.protocol = https_protocol[
+                                                   https_protocol.size() - 1];
+                    while (!safe_downloads.try_lock()) {
+                        std::this_thread::sleep_for(
+                                std::chrono::milliseconds(rand() % 4));
+                    }
                     download_queue->push(download_package);
                     safe_downloads.unlock();
                     href_references.pop_back();
@@ -339,22 +348,19 @@ private:
                     } else {
                         first_one = false;
                     }
-                    std::cout << "4a " << download_package.url
-                    << download_package.target << std::endl;
                 }
             } else {
                 sites_in_work.store(sites_in_work.load() - 1);
-                std::cout << "4b" << std::endl;
             }
         } else {
             sites_in_work.store(sites_in_work.load() - 1);
-            std::cout << "4c" << std::endl;
         }
 
         
         while (!img_references.empty()) {
             while (!safe_output.try_lock())
-                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+                std::this_thread::sleep_for(
+                        std::chrono::milliseconds(rand() % 4));
             output_queue->push(img_references[img_references.size() - 1]);
             safe_output.unlock();
             img_references.pop_back();
@@ -363,9 +369,7 @@ private:
 
         if (!sites_in_work.load()) {
             finish_him.store(true);
-            std::cout << "flag" << std::endl;
         }
-        std::cout << "6" << std::endl;
     }
     void writing_output(){
         std::ofstream ostream;
@@ -374,26 +378,24 @@ private:
             std::cout << "The file " << out << " is not open" << std::endl;
             throw std::logic_error("Output file is not opened!:(! ");
         }
-        std::cout << "6a" << std::endl;
         while (!finish_him.load()) {
             while (!safe_output.try_lock())
-                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+                std::this_thread::sleep_for(
+                        std::chrono::milliseconds(rand() % 5));
             bool empty_queue = output_queue->empty();
             safe_output.unlock();
-            //std::cout << "6b" << std::endl;
             while (!empty_queue) {
                 while (!safe_output.try_lock())
-                    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
+                    std::this_thread::sleep_for(
+                            std::chrono::milliseconds(rand() % 5));
                 std::string shit_to_write = output_queue->front();
                 ostream << shit_to_write << std::endl;
-                std::cout << "7 " << shit_to_write << std::endl;
                 output_queue->pop();
                 empty_queue = output_queue->empty();
                 safe_output.unlock();
             }
         }
         ostream.close();
-        std::cout << "8" << std::endl;
     }
     std::string prepare_url(std::string &url){
         std::string target("");
@@ -413,8 +415,11 @@ public:
 
             std::string target = prepare_url(url);
             download_queue->push(download_this(url, target, depth));
-            network_threads.push(std::bind(&MyCrawler::downloading_pages, this, &network_threads));
-            parsing_threads.push(std::bind(&MyCrawler::parsing_pages, this, &parsing_threads));
+
+            network_threads.push(std::bind(&MyCrawler::downloading_pages,
+                            this, &network_threads));
+            parsing_threads.push(std::bind(&MyCrawler::parsing_pages,
+                                this, &parsing_threads));
             writing_output();
         } catch (std::logic_error const& e){
             std::cout << e.what();
@@ -463,19 +468,23 @@ int main(int argc, char* argv[]){
     std::string task_type;
     desc.add_options()
             ("help,h", "Show help")
-            ("type,t", po::value<std::string>(&task_type),"Select task: parse")
+            ("type,t", po::value<std::string>(&task_type),
+                                         "Select task: parse")
             ;
     po::options_description parse_desc("Work options (everything required)");
     parse_desc.add_options()
             ("url,u", po::value<std::string>(), "Input start page")
             ("depth,d", po::value<uint32_t>(), "Input depth")
-            ("network_threads,N", po::value<uint32_t>(), "Input number of downloading threads")
-            ("parser_threads,P", po::value<uint32_t>(), "Input number of parsing threads")
+            ("network_threads,N", po::value<uint32_t>(),
+                               "Input number of downloading threads")
+            ("parser_threads,P", po::value<uint32_t>(),
+                                "Input number of parsing threads")
             ("output,O", po::value<std::string>(), "Output parameters file")
             ;
     po::variables_map vm;
     try {
-        po::parsed_options parsed = po::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+        po::parsed_options parsed = po::command_line_parser(argc,
+                argv).options(desc).allow_unregistered().run();
         po::store(parsed, vm);
         po::notify(vm);
         if(task_type == "parse") {

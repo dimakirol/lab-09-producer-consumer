@@ -46,17 +46,24 @@ typedef struct _download_this download_this;
 struct _parse_this{
     _parse_this(){
         url = std::string("");
+        target = std::string("");
         website = std::string("");
         current_depth = 0;
+        protocol = false;
     }
-    _parse_this(std::string link, std::string page, uint32_t _current_depth){
+    _parse_this(std::string link, std::string path,
+                std::string page, uint32_t _current_depth, bool _protocol){
         url = link;
+        target = path;
         website = page;
         current_depth = _current_depth;
+        protocol = _protocol;
     }
     std::string url;
+    std::string target;
     std::string website;
     uint32_t current_depth;
+    bool protocol;
 };
 typedef struct _parse_this parse_this;
 
@@ -140,48 +147,57 @@ private:
     static void search_for_links(GumboNode* node, 
                                  std::vector<std::string>& img_references, 
                                  std::vector<std::string>& href_references) {
-    if (node->type != GUMBO_NODE_ELEMENT) {
-        return;
-    }
-    GumboAttribute* ref;
-    if (((node->v.element.tag == GUMBO_TAG_A) || (node->v.element.tag == GUMBO_TAG_LINK)) &&
-        (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
-        href_references.push_back(std::string(ref->value));
-    }
+        if (node->type != GUMBO_NODE_ELEMENT) {
+            return;
+        }
+        GumboAttribute* ref;
+        if (((node->v.element.tag == GUMBO_TAG_A) || (node->v.element.tag == GUMBO_TAG_LINK)) &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
+            href_references.push_back(std::string(ref->value));
+        }
 
-    if (node->v.element.tag == GUMBO_TAG_META &&
-        (ref = gumbo_get_attribute(&node->v.element.attributes, "contents"))) {
-        img_references.push_back(std::string(ref->value));
-    }
-
-    if (node->v.element.tag == GUMBO_TAG_HTML &&
-        (ref = gumbo_get_attribute(&node->v.element.attributes, "itemtype"))) {
-        href_references.push_back(std::string(ref->value));
-    }
-
-    if (node->v.element.tag == GUMBO_TAG_IMG &&
-        (ref = gumbo_get_attribute(&node->v.element.attributes, "src"))) {
-        img_references.push_back(std::string(ref->value));
-    }
-
-    if (node->v.element.tag == GUMBO_TAG_INPUT &&
-        (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))) {
-        if (std::string(ref->value) == "image") {
-            ref = gumbo_get_attribute(&node->v.element.attributes, "src");
+        if (node->v.element.tag == GUMBO_TAG_META &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "contents"))) {
             img_references.push_back(std::string(ref->value));
+        }
+
+        if (node->v.element.tag == GUMBO_TAG_HTML &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "itemtype"))) {
+            href_references.push_back(std::string(ref->value));
+        }
+
+        if (node->v.element.tag == GUMBO_TAG_IMG &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "src"))) {
+            img_references.push_back(std::string(ref->value));
+        }
+
+        if (node->v.element.tag == GUMBO_TAG_INPUT &&
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))) {
+            if (std::string(ref->value) == "image") {
+                ref = gumbo_get_attribute(&node->v.element.attributes, "src");
+                img_references.push_back(std::string(ref->value));
+            }
+        }
+
+        GumboVector* children = &node->v.element.children;
+        for (unsigned int i = 0; i < children->length; ++i) {
+            search_for_links(static_cast<GumboNode*>(children->data[i]), img_references, href_references);
         }
     }
 
-    GumboVector* children = &node->v.element.children;
-    for (unsigned int i = 0; i < children->length; ++i) {
-        search_for_links(static_cast<GumboNode*>(children->data[i]), img_references, href_references);
+    void true_site(std::string& site, bool protocol) {
+        if (protocol) {
+            site = std::string("https://" + site);
+        } else {
+            site = std::string("http://" + site);
+        }
     }
-}
-
+    
     void all_right_references(std::vector<std::string>& img_references,
                           std::vector<std::string>& href_references,
                           std::vector<std::string>& paths_in_hrefs,
-                          std::string& site) {
+                          const std::string& site,
+                          const std::string& path_in_site) {
         
         for (auto i = img_references.begin(); i != img_references.end();) {
             if ((i->find(".jpg") != std::string::npos) ||
@@ -189,93 +205,110 @@ private:
                 (i->find(".gif") != std::string::npos) ||
                 (i->find(".ico") != std::string::npos) ||
                 (i->find(".svg") != std::string::npos)) {
+                    if (i->find("/") == 0) {
+                        *i = site + *i;
+                    }
                     i = img_references.erase(i);
-                } else {
-                    ++i;
-                }
+            } else {
+                ++i;
+            }
         }
 
         for (auto j = href_references.begin(); j != href_references.end();) {
-            if ((j->find(".jpg") != std::string::npos) ||
-                (j->find(".png") != std::string::npos) ||
-                (j->find(".gif") != std::string::npos) ||
-                (j->find(".svg") != std::string::npos) ||
-                (j->find(".ico") != std::string::npos)) {
+            if (j->find("#") != std::string::npos) {
+                j = href_references.erase(j);
+            } else if ((j->find(".jpg") != std::string::npos) ||
+                       (j->find(".png") != std::string::npos) ||
+                       (j->find(".gif") != std::string::npos) ||
+                       (j->find(".svg") != std::string::npos) ||
+                       (j->find(".ico") != std::string::npos)) {
                 img_references.push_back(*j);
                 j = href_references.erase(j);
             } else if (j->find("://") != std::string::npos) {
                 if (j->find("/", j->find("://") + 3) != std::string::npos) {
-
                     paths_in_hrefs.push_back(j->substr(
                             j->find("/", j->find("://") + 3), std::string::npos));
-
                     *j = j->substr(0, j->find("/", j->find("://") + 3));
-                    if (j->find("/") == std::string::npos) {
-                        paths_in_hrefs.emplace_back("/");
-                    }
+                } else {
+                    paths_in_hrefs.emplace_back("/");
                 }
                 ++j;
             } else if (j->find("/") == 0) {
                 paths_in_hrefs.push_back(*j);
                 *j = site;
+                ++j;
             } else {
                 ++j;
             }
         }
-
+        
+        auto k = href_references.begin();
         for (auto j = paths_in_hrefs.begin(); j != paths_in_hrefs.end();) {
-            if (j->find("#") == 0) {
-                *j = "/";
+            if (*k == site) {
+                if (path_in_site == "/") {
+                    *j = j->substr(j->find("/") + 1, std::string::npos);
+                }
+                *j = path_in_site + *j;
             }
             ++j;
+            ++k;
         }
-        
+    }
+ 
+    void about_https(std::vector<bool>& https_protocol, std::vector<std::string>& href_references) {
         for (auto j = href_references.begin(); j != href_references.end();) {
             if ((j->find("://") != std::string::npos)) {
-                *j = j->substr(j->find("://") + 3, std::string::npos);
+                if (j->find("https://") == 0) {
+                    *j = j->substr(j->find("://") + 3, std::string::npos);
+                    https_protocol.push_back(true);
+                } else {
+                    *j = j->substr(j->find("://") + 3, std::string::npos);
+                    https_protocol.push_back(false);
+                }
             }
             if (j->find("www.") != std::string::npos) {
                 *j = j->substr(j->find("www.") + 4, std::string::npos);
             }
             ++j;
         }
-
     }
- 
+    
     void parsing_pages(ctpl::thread_pool *parsing_threads) {
         //without finish_him
         //parsing_threads->push(std::bind(&MyCrawler::parsing_pages, this, parsing_threads));
-        std::string site_to_parse;
-        std::string main_site;
-        uint32_t current_depth;
         download_this download_package;
         parse_this parse_package;
         
         while (!safe_processing.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
         parse_package = processing_queue->front();
-        //site_to_parse = processing_queue->front().website;
-        //current_depth = processing_queue->front().current_depth;
         processing_queue->pop();
         safe_processing.unlock();
         
         std::vector<std::string> img_references;
         std::vector<std::string> href_references;
         std::vector<std::string> paths_in_hrefs;
+        std::vector<bool> https_protocol;
         
         GumboOutput* output = gumbo_parse(parse_package.website.c_str());
         search_for_links(output->root, img_references, href_references);
-        all_right_references(img_references, href_references, paths_in_hrefs, parse_package.url);
+        true_site(parse_package.url, parse_package.protocol);
+        all_right_references(img_references, href_references, paths_in_hrefs, parse_package.url, parse_package.target);
+        about_https(https_protocol, href_references);
         
-        if (current_depth) {
+        if (parse_package.current_depth) {
             while (!href_references.empty()) {
                 download_package.url = href_references[href_references.size() - 1];
                 download_package.current_depth = parse_package.current_depth - 1;
+                download_package.target = paths_in_hrefs[paths_in_hrefs.size() - 1];
+                download_package.protocol = https_protocol[https_protocol.size() - 1];
                 while (!safe_downloads.try_lock())
                     std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
                 download_queue->push(download_package);
                 safe_downloads.unlock();
                 href_references.pop_back();
+                paths_in_hrefs.pop_back();
+                https_protocol.pop_back();
             }
         }
 

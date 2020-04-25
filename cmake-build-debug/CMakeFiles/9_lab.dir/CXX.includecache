@@ -37,6 +37,8 @@ chrono
 -
 cstdlib
 -
+ctime
+-
 ctpl.h
 -
 fstream
@@ -82,10 +84,6 @@ boost/beast/http.hpp
 boost/beast/ssl.hpp
 -
 boost/beast/version.hpp
--
-boost/asio/connect.hpp
--
-boost/asio/ip/tcp.hpp
 -
 gumbo.h
 -

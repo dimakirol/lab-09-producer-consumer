@@ -5,7 +5,7 @@
 		<Option title="9_lab"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;CMake Files\tools\;CMake Files\tools\gate\;CMake Files\tools\gate\cmake\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\.hunter\;CMake Files\..\..\..\.hunter\_Base\;CMake Files\..\..\..\.hunter\_Base\Download\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\modules\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\find\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\configs\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\gumbo\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\OpenSSL\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\scripts\;CMake Files\..\..\..\.hunter\_Base\9a3594a\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\gumbo\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\_3rdParty\;CMake Files\cmake-build-debug\_3rdParty\Hunter\;CMake Files\cmake-build-debug\_3rdParty\Hunter\toolchain\;CMake Files\cmake-build-debug\_3rdParty\Hunter\config-id\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\tools\;CMake Files\tools\gate\;CMake Files\tools\gate\cmake\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\.hunter\;CMake Files\..\..\..\.hunter\_Base\;CMake Files\..\..\..\.hunter\_Base\Download\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\modules\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\find\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\configs\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\GTest\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\gumbo\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\OpenSSL\;CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\scripts\;CMake Files\..\..\..\.hunter\_Base\9a3594a\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\GTest\;CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\gumbo\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\_3rdParty\;CMake Files\cmake-build-debug\_3rdParty\Hunter\;CMake Files\cmake-build-debug\_3rdParty\Hunter\toolchain\;CMake Files\cmake-build-debug\_3rdParty\Hunter\config-id\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/cmake-build-debug"/>
@@ -347,6 +347,9 @@
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/Download/Hunter/0.23.218/9a3594a/Unpacked/cmake/configs/default.cmake">
 			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\configs\"/>
 		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/Download/Hunter/0.23.218/9a3594a/Unpacked/cmake/projects/GTest/hunter.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\GTest\"/>
+		</Unit>
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/Download/Hunter/0.23.218/9a3594a/Unpacked/cmake/projects/gumbo/hunter.cmake">
 			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\Download\Hunter\0.23.218\9a3594a\Unpacked\cmake\projects\gumbo\"/>
 		</Unit>
@@ -358,6 +361,21 @@
 		</Unit>
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/config.cmake">
 			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\"/>
+		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/cmake/GTest/GTestConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\GTest\"/>
+		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/cmake/GTest/GTestConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\GTest\"/>
+		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/cmake/GTest/GTestTargets-debug.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\GTest\"/>
+		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/cmake/GTest/GTestTargets-release.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\GTest\"/>
+		</Unit>
+		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/cmake/GTest/GTestTargets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\GTest\"/>
 		</Unit>
 		<Unit filename="/home/kirill/Documents/4_semestr/lab-09-producer-consumer/../../../.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install/lib/cmake/gumbo/gumboConfig.cmake">
 			<Option virtualFolder="CMake Files\..\..\..\.hunter\_Base\9a3594a\9b2c9d4\48401e9\Install\lib\cmake\gumbo\"/>

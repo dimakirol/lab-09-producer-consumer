@@ -10,6 +10,7 @@
 -- [hunter] Calculating Config-SHA1
 -- [hunter] HUNTER_ROOT: /home/kirill/.hunter
 -- [hunter] [ Hunter-ID: 9a3594a | Toolchain-ID: 9b2c9d4 | Config-ID: 48401e9 ]
+-- [hunter] GTEST_ROOT: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install (ver.: 1.8.0-hunter-p11)
 -- [hunter] GUMBO_ROOT: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install (ver.: 0.10.1)
 -- [hunter] OPENSSL_ROOT: /home/kirill/.hunter/_Base/9a3594a/9b2c9d4/48401e9/Install (ver.: 1.1.1c)
 -- Configuring done

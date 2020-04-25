@@ -361,6 +361,8 @@ private:
         } else {
             sites_in_work.store(sites_in_work.load() - 1);
         }
+        std::cout << "Sites in work " << sites_in_work.load()
+                  << ".............." << std::endl;
 
         while (!img_references.empty()) {
             while (!safe_output.try_lock()) {
@@ -474,44 +476,50 @@ Params parse_cmd(const po::variables_map& vm){
         cmd_params.out = vm["output"].as<std::string>();
     return cmd_params;
 }
+Params command_line_processor(int argc, char* argv[]){
+	po::options_description desc("General options");
+	std::string task_type;
+	desc.add_options()
+			("help,h", "Show help")
+			("type,t", po::value<std::string>(&task_type),
+			 "Select task: parse");
+	po::options_description parse_desc("Work options (everything required)");
+	parse_desc.add_options()
+			("url,u", po::value<std::string>(), "Input start page")
+			("depth,d", po::value<uint32_t>(), "Input depth")
+			("network_threads,N", po::value<uint32_t>(),
+			 "Input number of downloading threads")
+			("parser_threads,P", po::value<uint32_t>(),
+			 "Input number of parsing threads")
+			("output,O", po::value<std::string>(), "Output parameters file");
+	po::variables_map vm;
+	try {
+		po::parsed_options parsed = po::command_line_parser(argc,
+		                                                    argv).options(desc).allow_unregistered().run();
+		po::store(parsed, vm);
+		po::notify(vm);
+		if (task_type == "parse") {
+			desc.add(parse_desc);
+			po::store(po::parse_command_line(argc, argv, desc), vm);
+			Params cmd_params = parse_cmd(vm);
+			return cmd_params;
+		} else {
+			desc.add(parse_desc);
+			std::cout << desc << std::endl;
+		}
+	} catch(std::exception& ex) {
+		std::cout << desc << std::endl;
+	}
+	return Params();
+}
 
 int main(int argc, char* argv[]){
-    po::options_description desc("General options");
-    std::string task_type;
-    desc.add_options()
-            ("help,h", "Show help")
-            ("type,t", po::value<std::string>(&task_type),
-                                         "Select task: parse");
-    po::options_description parse_desc("Work options (everything required)");
-    parse_desc.add_options()
-            ("url,u", po::value<std::string>(), "Input start page")
-            ("depth,d", po::value<uint32_t>(), "Input depth")
-            ("network_threads,N", po::value<uint32_t>(),
-                               "Input number of downloading threads")
-            ("parser_threads,P", po::value<uint32_t>(),
-                                "Input number of parsing threads")
-            ("output,O", po::value<std::string>(), "Output parameters file");
-    po::variables_map vm;
     try {
-        po::parsed_options parsed = po::command_line_parser(argc,
-                argv).options(desc).allow_unregistered().run();
-        po::store(parsed, vm);
-        po::notify(vm);
-        if (task_type == "parse") {
-            desc.add(parse_desc);
-            po::store(po::parse_command_line(argc, argv, desc), vm);
-            Params cmd_params = parse_cmd(vm);
-
-//..............................................................................
+            Params cmd_params = command_line_processor(argc, argv);
             MyCrawler crawler(cmd_params);
             crawler.crawl_to_live();
-//..............................................................................
-        } else {
-            desc.add(parse_desc);
-            std::cout << desc << std::endl;
-        }
     } catch(std::exception& ex) {
-        std::cout << desc << std::endl;
+        std::cout << ex.what() << std::endl;
     }
     return 0;
 }

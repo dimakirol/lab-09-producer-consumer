@@ -1,5 +1,8 @@
 # Лабораторная работа №9
+[![Travis][build-badge]][build]
 
+[build-badge]: https://travis-ci.com/dimakirol/lab-09-producer-consumer.svg?branch=master
+[build]: https://travis-ci.com/dimakirol/lab-09-producer-consumer
 ## Задание
 
 Реализовать краулера с использованием шаблона *producer-consumer*.

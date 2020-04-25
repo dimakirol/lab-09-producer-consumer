@@ -95,8 +95,9 @@ private:
         bool empty_queue = true;
         while(empty_queue && !finish_him.load()) {
             while (!safe_downloads.try_lock()) {
+                unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
-                                       rand() % 5));
+                        rand_r(&now) % 3 + 1));
             }
             empty_queue = download_queue->empty();
             safe_downloads.unlock();
@@ -106,8 +107,9 @@ private:
         }
 
         while (!safe_downloads.try_lock()){
+            unsigned now = time(0);
             std::this_thread::sleep_for(std::chrono::milliseconds(
-                                         rand() % 5));
+                    rand_r(&now) % 5 + 1));
         }
         download_this url_to_download = download_queue->front();
         download_queue->pop();
@@ -138,8 +140,9 @@ private:
                 website, url_to_download.current_depth,
                 url_to_download.protocol);
         while (!safe_processing.try_lock()) {
+            unsigned now = time(0);
             std::this_thread::sleep_for(std::chrono::milliseconds(
-                                        rand() % 5));
+                    rand_r(&now) % 7 + 2));
         }
         processing_queue->push(site);
         safe_processing.unlock();
@@ -285,9 +288,11 @@ private:
     void parsing_pages(ctpl::thread_pool *parsing_threads) {
         bool empty_queue = true;
         while(empty_queue && !finish_him.load()) {
-            while (!safe_processing.try_lock())
-                std::this_thread::sleep_for(
-                        std::chrono::milliseconds(rand() % 4));
+            while (!safe_processing.try_lock()) {
+                unsigned now = time(0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(
+                        rand_r(&now) % 4 + 1));
+            }
             empty_queue = processing_queue->empty();
             safe_processing.unlock();
         }
@@ -299,8 +304,9 @@ private:
         parse_this parse_package;
 
         while (!safe_processing.try_lock()) {
-            std::this_thread::sleep_for(
-                    std::chrono::milliseconds(rand() % 4));
+            unsigned now = time(0);
+            std::this_thread::sleep_for(std::chrono::milliseconds(
+                    rand_r(&now) % 9 + 3));
         }
         parse_package = processing_queue->front();
         processing_queue->pop();
@@ -335,8 +341,9 @@ private:
                     download_package.protocol = https_protocol[
                                                    https_protocol.size() - 1];
                     while (!safe_downloads.try_lock()) {
-                        std::this_thread::sleep_for(
-                                std::chrono::milliseconds(rand() % 4));
+                        unsigned now = time(0);
+                        std::this_thread::sleep_for(std::chrono::milliseconds(
+                                rand_r(&now) % 3 + 1));
                     }
                     download_queue->push(download_package);
                     safe_downloads.unlock();
@@ -358,9 +365,11 @@ private:
 
         
         while (!img_references.empty()) {
-            while (!safe_output.try_lock())
-                std::this_thread::sleep_for(
-                        std::chrono::milliseconds(rand() % 4));
+            while (!safe_output.try_lock()) {
+                unsigned now = time(0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(
+                        rand_r(&now) % 3 + 1));
+            }
             output_queue->push(img_references[img_references.size() - 1]);
             safe_output.unlock();
             img_references.pop_back();
@@ -379,15 +388,19 @@ private:
             throw std::logic_error("Output file is not opened!:(! ");
         }
         while (!finish_him.load()) {
-            while (!safe_output.try_lock())
-                std::this_thread::sleep_for(
-                        std::chrono::milliseconds(rand() % 5));
+            while (!safe_output.try_lock()){
+                unsigned now = time(0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(
+                        rand_r(&now) % 5 + 1));
+            }
             bool empty_queue = output_queue->empty();
             safe_output.unlock();
             while (!empty_queue) {
-                while (!safe_output.try_lock())
-                    std::this_thread::sleep_for(
-                            std::chrono::milliseconds(rand() % 5));
+                while (!safe_output.try_lock()) {
+                    unsigned now = time(0);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(
+                            rand_r(&now) % 5 + 1));
+                }
                 std::string shit_to_write = output_queue->front();
                 ostream << shit_to_write << std::endl;
                 output_queue->pop();

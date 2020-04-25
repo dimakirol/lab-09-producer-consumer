@@ -216,9 +216,9 @@ private:
                     if (i->find("/") == 0) {
                         *i = site + *i;
                     }
-                    i = img_references.erase(i);
+                    ++i;
             } else {
-                ++i;
+                i = img_references.erase(i);
             }
         }
 
@@ -230,6 +230,9 @@ private:
                        (j->find(".gif") != std::string::npos) ||
                        (j->find(".svg") != std::string::npos) ||
                        (j->find(".ico") != std::string::npos)) {
+                if (j->find("/") == 0) {
+                    *j = site + *j;
+                }
                 img_references.push_back(*j);
                 j = href_references.erase(j);
             } else if (j->find("://") != std::string::npos) {

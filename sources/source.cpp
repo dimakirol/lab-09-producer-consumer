@@ -93,7 +93,7 @@ public:
 private:
     void downloading_pages(ctpl::thread_pool *network_threads){
         bool empty_queue = true;
-        while(empty_queue && !finish_him.load()) {
+        while (empty_queue && !finish_him.load()) {
             while (!safe_downloads.try_lock()) {
                 unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
@@ -147,8 +147,8 @@ private:
         processing_queue->push(site);
         safe_processing.unlock();
     }
-    static void search_for_links(GumboNode* node, 
-                                 std::vector<std::string>& img_references, 
+    static void search_for_links(GumboNode* node,
+                                 std::vector<std::string>& img_references,
                                  std::vector<std::string>& href_references) {
         if (node->type != GUMBO_NODE_ELEMENT) {
             return;
@@ -156,7 +156,7 @@ private:
         GumboAttribute* ref;
         if (((node->v.element.tag == GUMBO_TAG_A) ||
             (node->v.element.tag == GUMBO_TAG_LINK)) &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes,"href"))) {
+            (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))){
             href_references.push_back(std::string(ref->value));
         }
 
@@ -199,13 +199,12 @@ private:
             site = std::string("http://" + site);
         }
     }
-    
+
     void all_right_references(std::vector<std::string>& img_references,
                           std::vector<std::string>& href_references,
                           std::vector<std::string>& paths_in_hrefs,
                           const std::string& site,
                           const std::string& path_in_site) {
-        
         for (auto i = img_references.begin(); i != img_references.end();) {
             if ((i->find(".jpg") != std::string::npos) ||
                 (i->find(".png") != std::string::npos) ||
@@ -252,7 +251,7 @@ private:
                 ++j;
             }
         }
-        
+
         auto k = href_references.begin();
         for (auto j = paths_in_hrefs.begin(); j != paths_in_hrefs.end();) {
             if (*k == site) {
@@ -265,9 +264,9 @@ private:
             ++k;
         }
     }
- 
+
     void about_https(std::vector<bool>& https_protocol,
-                     std::vector<std::string>& href_references) {
+            std::vector<std::string>& href_references) {
         for (auto j = href_references.begin(); j != href_references.end();) {
             if ((j->find("://") != std::string::npos)) {
                 if (j->find("https://") == 0) {
@@ -284,10 +283,10 @@ private:
             ++j;
         }
     }
-    
+
     void parsing_pages(ctpl::thread_pool *parsing_threads) {
         bool empty_queue = true;
-        while(empty_queue && !finish_him.load()) {
+        while (empty_queue && !finish_him.load()) {
             while (!safe_processing.try_lock()) {
                 unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
@@ -319,7 +318,7 @@ private:
         std::vector<std::string> href_references;
         std::vector<std::string> paths_in_hrefs;
         std::vector<bool> https_protocol;
-       
+
         GumboOutput* output = gumbo_parse(parse_package.website.c_str());
         search_for_links(output->root, img_references, href_references);
         true_site(parse_package.url, parse_package.protocol);
@@ -363,7 +362,6 @@ private:
             sites_in_work.store(sites_in_work.load() - 1);
         }
 
-        
         while (!img_references.empty()) {
             while (!safe_output.try_lock()) {
                 unsigned now = time(0);
@@ -420,6 +418,7 @@ private:
         }
         return target;
     }
+
 public:
     void crawl_to_live(){
         try {
@@ -447,7 +446,7 @@ private:
     uint32_t net_thread;
     uint32_t pars_thread;
     std::string out;
-    
+
     std::atomic_bool finish_him;
     std::atomic_uint sites_in_work;
 
@@ -465,13 +464,13 @@ Params parse_cmd(const po::variables_map& vm){
     Params cmd_params;
     if (vm.count("url"))
         cmd_params.url = vm["url"].as<std::string>();
-    if(vm.count("depth"))
+    if (vm.count("depth"))
         cmd_params.depth = vm["depth"].as<uint32_t>();
-    if(vm.count("network_threads"))
+    if (vm.count("network_threads"))
         cmd_params.net_thread = vm["network_threads"].as<uint32_t>();
-    if(vm.count("parser_threads"))
+    if (vm.count("parser_threads"))
         cmd_params.pars_thread = vm["parser_threads"].as<uint32_t>();
-    if(vm.count("output"))
+    if (vm.count("output"))
         cmd_params.out = vm["output"].as<std::string>();
     return cmd_params;
 }
@@ -482,8 +481,7 @@ int main(int argc, char* argv[]){
     desc.add_options()
             ("help,h", "Show help")
             ("type,t", po::value<std::string>(&task_type),
-                                         "Select task: parse")
-            ;
+                                         "Select task: parse");
     po::options_description parse_desc("Work options (everything required)");
     parse_desc.add_options()
             ("url,u", po::value<std::string>(), "Input start page")
@@ -492,15 +490,14 @@ int main(int argc, char* argv[]){
                                "Input number of downloading threads")
             ("parser_threads,P", po::value<uint32_t>(),
                                 "Input number of parsing threads")
-            ("output,O", po::value<std::string>(), "Output parameters file")
-            ;
+            ("output,O", po::value<std::string>(), "Output parameters file");
     po::variables_map vm;
     try {
         po::parsed_options parsed = po::command_line_parser(argc,
                 argv).options(desc).allow_unregistered().run();
         po::store(parsed, vm);
         po::notify(vm);
-        if(task_type == "parse") {
+        if (task_type == "parse") {
             desc.add(parse_desc);
             po::store(po::parse_command_line(argc, argv, desc), vm);
             Params cmd_params = parse_cmd(vm);
@@ -509,13 +506,11 @@ int main(int argc, char* argv[]){
             MyCrawler crawler(cmd_params);
             crawler.crawl_to_live();
 //..............................................................................
-        }
-        else {
+        } else {
             desc.add(parse_desc);
             std::cout << desc << std::endl;
         }
-    }
-    catch(std::exception& ex) {
+    } catch(std::exception& ex) {
         std::cout << desc << std::endl;
     }
     return 0;

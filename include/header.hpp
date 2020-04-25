@@ -34,8 +34,6 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/version.hpp>
-#include <boost/asio/connect.hpp>
-#include <boost/asio/ip/tcp.hpp>
 
 #include <gumbo.h>
 
@@ -43,7 +41,7 @@
 #define HTTPS_PORT "443"
 
 
-namespace po=boost::program_options;
+namespace po = boost::program_options;
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -54,7 +52,6 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 std::string get_https_page(std::string host, std::string port,
                            std::string target)
 {
-
     std::string web_page("");
     int version = 11;
 
@@ -139,8 +136,9 @@ std::string get_http_page(std::string host, std::string port,
         // not_connected happens sometimes
         // so don't bother reporting it.
 
-        if(ec && ec != boost::system::errc::not_connected)
+        if (ec && ec != boost::system::errc::not_connected) {
             throw boost::system::system_error{ec};
+        }
 
         // If we get here then the connection is closed gracefully
     }

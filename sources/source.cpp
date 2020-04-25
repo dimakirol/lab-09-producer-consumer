@@ -117,7 +117,7 @@ private:
             return;
 //        network_threads->push(std::bind(&MyCrawler::downloading_pages, this, network_threads));
 
-        while (!safe_downloads.try_lock())
+        while (!safe_downloads8.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 5));
         download_this url_to_download = download_queue->front();
         download_queue->pop();
@@ -274,11 +274,19 @@ private:
     }
     
     void parsing_pages(ctpl::thread_pool *parsing_threads) {
-        //without finish_him
+        bool empty_queue = true;
+        while(empty_queue && !finish_him.load()) {
+            while (!safe_processing.try_lock())
+                std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+            empty_queue = processing_queue->empty();
+            safe_processing.unlock();
+        }
+        if (finish_him.load())
+            return;
         //parsing_threads->push(std::bind(&MyCrawler::parsing_pages, this, parsing_threads));
         download_this download_package;
         parse_this parse_package;
-        
+       
         while (!safe_processing.try_lock())
             std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
         parse_package = processing_queue->front();
@@ -289,7 +297,7 @@ private:
         std::vector<std::string> href_references;
         std::vector<std::string> paths_in_hrefs;
         std::vector<bool> https_protocol;
-        
+       
         GumboOutput* output = gumbo_parse(parse_package.website.c_str());
         search_for_links(output->root, img_references, href_references);
         true_site(parse_package.url, parse_package.protocol);
@@ -297,19 +305,26 @@ private:
         about_https(https_protocol, href_references);
         
         if (parse_package.current_depth) {
-            while (!href_references.empty()) {
-                download_package.url = href_references[href_references.size() - 1];
-                download_package.current_depth = parse_package.current_depth - 1;
-                download_package.target = paths_in_hrefs[paths_in_hrefs.size() - 1];
-                download_package.protocol = https_protocol[https_protocol.size() - 1];
-                while (!safe_downloads.try_lock())
-                    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
-                download_queue->push(download_package);
-                safe_downloads.unlock();
-                href_references.pop_back();
-                paths_in_hrefs.pop_back();
-                https_protocol.pop_back();
+            if (!href_references.empty()) {
+                while (!href_references.empty()) {
+                    download_package.url = href_references[href_references.size() - 1];
+                    download_package.current_depth = parse_package.current_depth - 1;
+                    download_package.target = paths_in_hrefs[paths_in_hrefs.size() - 1];
+                    download_package.protocol = https_protocol[https_protocol.size() - 1];
+                    while (!safe_downloads.try_lock())
+                        std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 4));
+                    download_queue->push(download_package);
+                    safe_downloads.unlock();
+                    href_references.pop_back();
+                    paths_in_hrefs.pop_back();
+                    https_protocol.pop_back();
+                    ++sites_in_work;
+                }
+            } else {
+                --sites_in_work;
             }
+        } else {
+            --sites_in_work;
         }
 
         
@@ -322,6 +337,9 @@ private:
         }
         
         gumbo_destroy_output(&kGumboDefaultOptions, output);
+        
+        if (!sites_in_work)
+            finish_him = true;
     }
     void writing_output(){
         std::ofstream ostream;

@@ -62,7 +62,7 @@ target_include_directories(tests
         )
 
 target_link_libraries(tests GTest::main 9_lab gumbo::gumbo OpenSSL::SSL)
-target_link_libraries(9_lab Boost::program_options Boost::log Boost::thread)
+target_link_libraries(9_lab Boost::program_options Boost::thread)
 
 #include_directories(${Boost_INCLUDE_DIRS})
 #target_link_libraries(9_lab ${Boost_LIBRARIES} gumbo::gumbo OpenSSL::SSL)

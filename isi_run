@@ -1,4 +1,4 @@
 #!/bin/bash
 cd cmake-build-debug
-./9_lab --type=parse --url=$1  --depth=2 --network_threads=4 --parser_threads=2 --output=my_mind.txt
+./9_lab --type=parse --url=$1  --depth=2 --network_threads=10 --parser_threads=20 --output=my_mind.txt
 

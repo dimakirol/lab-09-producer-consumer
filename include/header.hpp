@@ -78,9 +78,13 @@ std::string get_https_page(std::string host, std::string port, std::string targe
         boost::beast::flat_buffer buffer;
         http::response<http::dynamic_body> res;
         http::read(stream, buffer, res);
-        web_page =  boost::beast::buffers_to_string(res.body().data());
+        web_page = boost::beast::buffers_to_string(res.body().data());
+    } catch (std::exception const& e) {
+        std::cerr << "Error: " << e.what() << " in https downloading page "
+                               << host << target << std::endl;
+        return "404";
     } catch (...) {
-        std::cout << "Error in https downloading page ";
+        std::cout << "Error in https downloading page " << host << target << std::endl;
         return "404";
     }
     return web_page;
@@ -146,7 +150,8 @@ std::string get_http_page(std::string host, std::string port, std::string target
     }
     catch(std::exception const& e)
     {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << " in http downloading page "
+                               << host << target << std::endl;
         web_site = std::string("404");
     }
     return  web_site;

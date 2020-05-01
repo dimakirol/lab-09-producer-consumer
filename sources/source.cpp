@@ -16,6 +16,7 @@ struct _download_this{
         url = std::string("");
         target = std::string("/");
         current_depth = 0;
+        protocol = true;
     }
     _download_this(std::string link, std::string path_in_server,
             uint32_t _current_depth, bool _protocol){
@@ -40,7 +41,7 @@ struct _download_this{
     std::string url;
     std::string target;
     uint32_t current_depth;
-    bool protocol;
+    bool protocol; //0-http; 1-https
 };
 typedef struct _download_this download_this;
 
@@ -73,7 +74,7 @@ public:
     explicit MyCrawler(Params &parameters){
         url = parameters.url;
         depth = parameters.depth;
-        sites_in_work.store(1);
+        sites_in_work.store(odin);
         net_thread = parameters.net_thread;
         pars_thread = parameters.pars_thread;
         out = parameters.out;
@@ -95,9 +96,8 @@ private:
         bool empty_queue = true;
         while (empty_queue && !finish_him.load()) {
             while (!safe_downloads.try_lock()) {
-                unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
-                        rand_r(&now) % 3 + 1));
+                        kirill_sleeps_seconds));
             }
             empty_queue = download_queue->empty();
             safe_downloads.unlock();
@@ -107,9 +107,8 @@ private:
         }
 
         while (!safe_downloads.try_lock()){
-            unsigned now = time(0);
             std::this_thread::sleep_for(std::chrono::milliseconds(
-                    rand_r(&now) % 5 + 1));
+                    kirill_sleeps_seconds));
         }
         download_this url_to_download = download_queue->front();
         download_queue->pop();
@@ -124,15 +123,14 @@ private:
         if (url_to_download.protocol){
             website = get_https_page(url_to_download.url,
                                      HTTPS_PORT, url_to_download.target);
-            if ((website == std::string("404")) ||
-                   (website == std::string("")) ||
-                   (website.find("301 Moved Permanently")
-                                                   != std::string::npos)) {
-                website = get_https_page(("www." + url_to_download.url),
+            if ((website == std::string(NOT_FOUND)) ||
+                (website == std::string("")) ||
+                (website.find(MOVED_PERMANENTLY) != std::string::npos)) {
+                        website = get_https_page((WWW + url_to_download.url),
                                          HTTPS_PORT, url_to_download.target);
             }
         } else {
-            website = get_http_page(("www." + url_to_download.url),
+            website = get_http_page((WWW + url_to_download.url),
                     HTTP_PORT, url_to_download.target);
         }
         down_load.unlock();
@@ -140,9 +138,8 @@ private:
                 website, url_to_download.current_depth,
                 url_to_download.protocol);
         while (!safe_processing.try_lock()) {
-            unsigned now = time(0);
             std::this_thread::sleep_for(std::chrono::milliseconds(
-                    rand_r(&now) % 7 + 2));
+                    kirill_sleeps_seconds));
         }
         processing_queue->push(site);
         safe_processing.unlock();
@@ -156,31 +153,31 @@ private:
         GumboAttribute* ref;
         if (((node->v.element.tag == GUMBO_TAG_A) ||
             (node->v.element.tag == GUMBO_TAG_LINK)) &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "href"))){
+            (ref = gumbo_get_attribute(&node->v.element.attributes, HREF))){
             href_references.push_back(std::string(ref->value));
         }
 
         if (node->v.element.tag == GUMBO_TAG_META &&
             (ref = gumbo_get_attribute(&node->v.element.attributes,
-                    "contents"))) {
+                                       CONTENTS))) {
             img_references.push_back(std::string(ref->value));
         }
 
         if (node->v.element.tag == GUMBO_TAG_HTML &&
             (ref = gumbo_get_attribute(&node->v.element.attributes,
-                    "itemtype"))) {
+                                       ITEMTYPE))) {
             href_references.push_back(std::string(ref->value));
         }
 
         if (node->v.element.tag == GUMBO_TAG_IMG &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "src"))) {
+            (ref = gumbo_get_attribute(&node->v.element.attributes, SRC))) {
             img_references.push_back(std::string(ref->value));
         }
 
         if (node->v.element.tag == GUMBO_TAG_INPUT &&
-            (ref = gumbo_get_attribute(&node->v.element.attributes, "type"))){
-            if (std::string(ref->value) == "image") {
-                ref = gumbo_get_attribute(&node->v.element.attributes, "src");
+            (ref = gumbo_get_attribute(&node->v.element.attributes, TYPE))){
+            if (std::string(ref->value) == IMAGE) {
+                ref = gumbo_get_attribute(&node->v.element.attributes, SRC);
                 img_references.push_back(std::string(ref->value));
             }
         }
@@ -194,9 +191,9 @@ private:
 
     void true_site(std::string& site, bool protocol) {
         if (protocol) {
-            site = std::string("https://" + site);
+            site = std::string(HTTPS + site);
         } else {
-            site = std::string("http://" + site);
+            site = std::string(HTTP + site);
         }
     }
 
@@ -206,11 +203,11 @@ private:
                           const std::string& site,
                           const std::string& path_in_site) {
         for (auto i = img_references.begin(); i != img_references.end();) {
-            if ((i->find(".jpg") != std::string::npos) ||
-                (i->find(".png") != std::string::npos) ||
-                (i->find(".gif") != std::string::npos) ||
-                (i->find(".ico") != std::string::npos) ||
-                (i->find(".svg") != std::string::npos)) {
+            if ((i->find(JPG) != std::string::npos) ||
+                (i->find(PNG) != std::string::npos) ||
+                (i->find(GIF) != std::string::npos) ||
+                (i->find(ICO) != std::string::npos) ||
+                (i->find(SVG) != std::string::npos)) {
                     if (i->find("/") == 0) {
                         *i = site + *i;
                     }
@@ -221,24 +218,24 @@ private:
         }
 
         for (auto j = href_references.begin(); j != href_references.end();) {
-            if (j->find("#") != std::string::npos) {
+            if (j->find(OCTOTORP) != std::string::npos) {
                 j = href_references.erase(j);
-            } else if ((j->find(".jpg") != std::string::npos) ||
-                       (j->find(".png") != std::string::npos) ||
-                       (j->find(".gif") != std::string::npos) ||
-                       (j->find(".svg") != std::string::npos) ||
-                       (j->find(".ico") != std::string::npos)) {
+            } else if ((j->find(JPG) != std::string::npos) ||
+                       (j->find(PNG) != std::string::npos) ||
+                       (j->find(GIF) != std::string::npos) ||
+                       (j->find(ICO) != std::string::npos) ||
+                       (j->find(SVG) != std::string::npos)) {
                 if (j->find("/") == 0) {
                     *j = site + *j;
                 }
                 img_references.push_back(*j);
                 j = href_references.erase(j);
-            } else if (j->find("://") != std::string::npos) {
-                if (j->find("/", j->find("://") + 3) != std::string::npos) {
+            } else if (j->find(SAD_SMILE) != std::string::npos) {
+                if (j->find("/", j->find(SAD_SMILE) + tri) != std::string::npos) {
                     paths_in_hrefs.push_back(j->substr(
-                            j->find("/", j->find("://") + 3),
+                            j->find("/", j->find(SAD_SMILE) + tri),
                                           std::string::npos));
-                    *j = j->substr(0, j->find("/", j->find("://") + 3));
+                    *j = j->substr(0, j->find("/", j->find(SAD_SMILE) + tri));
                 } else {
                     paths_in_hrefs.emplace_back("/");
                 }
@@ -256,7 +253,7 @@ private:
         for (auto j = paths_in_hrefs.begin(); j != paths_in_hrefs.end();) {
             if (*k == site) {
                 if (path_in_site == "/") {
-                    *j = j->substr(j->find("/") + 1, std::string::npos);
+                    *j = j->substr(j->find("/") + odin, std::string::npos);
                 }
                 *j = path_in_site + *j;
             }
@@ -268,17 +265,17 @@ private:
     void about_https(std::vector<bool>& https_protocol,
             std::vector<std::string>& href_references) {
         for (auto j = href_references.begin(); j != href_references.end();) {
-            if ((j->find("://") != std::string::npos)) {
-                if (j->find("https://") == 0) {
-                    *j = j->substr(j->find("://") + 3, std::string::npos);
+            if ((j->find(SAD_SMILE) != std::string::npos)) {
+                if (j->find(HTTPS) == 0) {
+                    *j = j->substr(j->find(SAD_SMILE) + tri, std::string::npos);
                     https_protocol.push_back(true);
                 } else {
-                    *j = j->substr(j->find("://") + 3, std::string::npos);
+                    *j = j->substr(j->find(SAD_SMILE) + tri, std::string::npos);
                     https_protocol.push_back(false);
                 }
             }
-            if (j->find("www.") != std::string::npos) {
-                *j = j->substr(j->find("www.") + 4, std::string::npos);
+            if (j->find(WWW) != std::string::npos) {
+                *j = j->substr(j->find(WWW) + chetire, std::string::npos);
             }
             ++j;
         }
@@ -288,9 +285,8 @@ private:
         bool empty_queue = true;
         while (empty_queue && !finish_him.load()) {
             while (!safe_processing.try_lock()) {
-                unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
-                        rand_r(&now) % 4 + 1));
+                        dima_sleeps_seconds));
             }
             empty_queue = processing_queue->empty();
             safe_processing.unlock();
@@ -303,9 +299,8 @@ private:
         parse_this parse_package;
 
         while (!safe_processing.try_lock()) {
-            unsigned now = time(0);
             std::this_thread::sleep_for(std::chrono::milliseconds(
-                    rand_r(&now) % 9 + 3));
+                    dima_sleeps_seconds));
         }
         parse_package = processing_queue->front();
         processing_queue->pop();
@@ -332,17 +327,16 @@ private:
                 bool first_one = true;
                 while (!href_references.empty()) {
                     download_package.url = href_references[
-                                                  href_references.size() - 1];
+                                                href_references.size() - odin];
                     download_package.current_depth =
-                            parse_package.current_depth - 1;
+                            parse_package.current_depth - odin;
                     download_package.target = paths_in_hrefs[
-                                                   paths_in_hrefs.size() - 1];
+                                                 paths_in_hrefs.size() - odin];
                     download_package.protocol = https_protocol[
-                                                   https_protocol.size() - 1];
+                                                 https_protocol.size() - odin];
                     while (!safe_downloads.try_lock()) {
-                        unsigned now = time(0);
                         std::this_thread::sleep_for(std::chrono::milliseconds(
-                                rand_r(&now) % 3 + 1));
+                                dima_sleeps_seconds));
                     }
                     download_queue->push(download_package);
                     safe_downloads.unlock();
@@ -350,27 +344,26 @@ private:
                     paths_in_hrefs.pop_back();
                     https_protocol.pop_back();
                     if (!first_one){
-                        sites_in_work.store(sites_in_work.load() + 1);
+                        sites_in_work.store(sites_in_work.load() + odin);
                     } else {
                         first_one = false;
                     }
                 }
             } else {
-                sites_in_work.store(sites_in_work.load() - 1);
+                sites_in_work.store(sites_in_work.load() - odin);
             }
         } else {
-            sites_in_work.store(sites_in_work.load() - 1);
+            sites_in_work.store(sites_in_work.load() - odin);
         }
         std::cout << "Sites in work " << sites_in_work.load()
                   << ".............." << std::endl;
 
         while (!img_references.empty()) {
             while (!safe_output.try_lock()) {
-                unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
-                        rand_r(&now) % 3 + 1));
+                        dima_sleeps_seconds));
             }
-            output_queue->push(img_references[img_references.size() - 1]);
+            output_queue->push(img_references[img_references.size() - odin]);
             safe_output.unlock();
             img_references.pop_back();
         }
@@ -382,24 +375,22 @@ private:
     }
     void writing_output(){
         std::ofstream ostream;
-        ostream.open(out);//, std::ios::out);
+        ostream.open(out);
         if (!ostream.is_open()){
             std::cout << "The file " << out << " is not open" << std::endl;
             throw std::logic_error("Output file is not opened!:(! ");
         }
         while (!finish_him.load()) {
             while (!safe_output.try_lock()){
-                unsigned now = time(0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(
-                        rand_r(&now) % 5 + 1));
+                        masha_sleeps_seconds));
             }
             bool empty_queue = output_queue->empty();
             safe_output.unlock();
             while (!empty_queue) {
                 while (!safe_output.try_lock()) {
-                    unsigned now = time(0);
                     std::this_thread::sleep_for(std::chrono::milliseconds(
-                            rand_r(&now) % 5 + 1));
+                            masha_sleeps_seconds));
                 }
                 std::string shit_to_write = output_queue->front();
                 ostream << shit_to_write << std::endl;

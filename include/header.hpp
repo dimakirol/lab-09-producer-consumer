@@ -39,7 +39,32 @@
 
 #define HTTP_PORT "80"
 #define HTTPS_PORT "443"
+#define WWW "www."
+#define NOT_FOUND "404"
+#define MOVED_PERMANENTLY "301 Moved Permanently"
+#define SRC "src"
+#define HREF "href"
+#define CONTENTS "contents"
+#define ITEMTYPE "itemtype"
+#define TYPE "type"
+#define IMAGE "image"
+#define HTTPS "https://"
+#define HTTP "http://"
+#define JPG ".jpg"
+#define PNG ".png"
+#define GIF ".gif"
+#define ICO ".ico"
+#define SVG ".svg"
+#define SAD_SMILE "://"
+#define OCTOTORP "#"
 
+static const uint32_t masha_sleeps_seconds = time(NULL) % 5 + 1;
+static const uint32_t odin = 1;
+static const uint32_t tri = 3;
+static const uint32_t dima_sleeps_seconds = time(NULL) % 9 + 3;
+static const uint32_t chetire = 4;
+static const uint32_t odin_adzat = 11;
+static const uint32_t kirill_sleeps_seconds = time(NULL) % 7 + 1;
 
 namespace po = boost::program_options;
 
@@ -53,7 +78,7 @@ std::string get_https_page(std::string host, std::string port,
                            std::string target)
 {
     std::string web_page("");
-    int version = 11;
+    int version = odin_adzat;
 
     try {
         boost::asio::io_context ioc;
@@ -82,9 +107,9 @@ std::string get_https_page(std::string host, std::string port,
     } catch (std::exception const& e) {
         std::cerr << "Error: " << e.what() << " in https downloading page "
                                << host << target << std::endl;
-        return "404";
+        return NOT_FOUND;
     } catch (...) {
-        return "404";
+        return NOT_FOUND;
     }
     return web_page;
 }
@@ -93,7 +118,7 @@ std::string get_http_page(std::string host, std::string port,
     std::string web_site("");
     try
     {
-        int version = 11;
+        int version = odin_adzat;
 
         // The io_context is required for all I/O
         boost::asio::io_context ioc;
@@ -146,7 +171,7 @@ std::string get_http_page(std::string host, std::string port,
     {
         std::cerr << "Error: " << e.what() << " in http downloading page "
                                << host << target << std::endl;
-        web_site = std::string("404");
+        web_site = std::string(NOT_FOUND);
     }
     return  web_site;
 }

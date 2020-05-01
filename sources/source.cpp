@@ -41,7 +41,7 @@ struct _download_this{
     std::string url;
     std::string target;
     uint32_t current_depth;
-    bool protocol; //0-http; 1-https
+    bool protocol; //0-http;  1-https
 };
 typedef struct _download_this download_this;
 

@@ -29,7 +29,7 @@ option(BUILD_COVERAGE "Build coverage" OFF)
 set(BEAST_INCLUDE_DIR ${Boost_INCLUDE_DIR}/beast)
 include_directories(${BEAST_INCLUDE_DIR})
 
-find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options coroutine log log_setup thread)
+#find_package(Boost 1.72.0 REQUIRED COMPONENTS program_options coroutine log log_setup thread)
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
 
